@@ -1,11 +1,11 @@
 ####Data Entry#####
-#replace 'name' with the name of a dataframe in your global environment
+#replace 'name' with the name of a dataframe in your global environment.
 dat <- name #<---- Replace
 #Then press cntrl + a, then cntrl + enter. The app should initialize.
 
 ####Packages####
 #Use {install.packages('package_name')} on any required
-#packages that have not yet been installed
+#packages that have not yet been installed.
 require('dplyr')
 require('DT')
 require('jmv')
