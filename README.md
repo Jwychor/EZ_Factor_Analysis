@@ -16,7 +16,6 @@ Functions from the following packages are required to be installed on your machi
 
 dplyr
 DT
-stats
 jmv
 shiny
 shinydashboard
