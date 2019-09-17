@@ -1,4 +1,4 @@
-# EZ-Factor-Analysis
+# EZ-Factor-Analysis Dashboard
 Interactive R - Shiny dashboard for factor analysis.
 
 
