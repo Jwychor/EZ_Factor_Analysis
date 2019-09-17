@@ -1,11 +1,11 @@
 ####Data Entry#####
-#replace 'name' with the name of a dataframe in your global environment.
-dat <- name #<---- Replace
+#replace 'name' with the name of a dataframe in your global environment
+dat <- os #<---- Replace
 #Then press cntrl + a, then cntrl + enter. The app should initialize.
 
 ####Packages####
 #Use {install.packages('package_name')} on any required
-#packages that have not yet been installed.
+#packages that have not yet been installed
 require('dplyr')
 require('DT')
 require('jmv')
@@ -50,8 +50,12 @@ ui <- fluidPage(
     plotOutput(outputId = 'scree',width = '100%')
   )),
   div(DT::dataTableOutput(outputId = 'factor.table'),
-      style = "font-size: 90%; width: 45%")
+      style = "font-size: 100%; width: 45%"),
+  
+  div(DT::dataTableOutput(outputId = 'eigen.table'),
+      style = "font-size: 100%; width: 95%")
 )
+  
 
 server <- function(input, output, session) {
   
@@ -60,12 +64,18 @@ server <- function(input, output, session) {
   e3<-reactive({input$rotation})
   
   r1<-eventReactive(input$button,{pca(dat,nFactorMethod='fixed',nFactors = e1(),hideLoadings=e2(),
-                screePlot=F,sortLoadings = T,eigen = T,rotation=e3())})
+                screePlot=F,sortLoadings = T,eigen = T,rotation=e3(),
+                factorSummary = T)})
   
   output$factor.table <- DT::renderDataTable({
     DT::datatable(round_df(as.data.frame(r1()$loadings)[,-1],digits=3),
           options = list(pageLength = ncol(dat),
                          lengthMenu = c(5,10,15,round(1/2*ncol(dat),0),ncol(dat))))
+  })
+  
+  output$eigen.table <- DT::renderDataTable({
+    DT::datatable(round_df(as.data.frame(r1()$factorStats$factorSummary)[,-1],digits=2),
+        options = list(pageLength = e1()))
   })
   
   output$scree <- renderPlot({
@@ -74,4 +84,3 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui, server)
-
