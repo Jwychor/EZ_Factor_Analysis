@@ -1,6 +1,6 @@
 ####Data Entry#####
 #replace 'name' with the name of a dataframe in your global environment
-dat <- name #<---- Replace
+dat <- os #<---- Replace
 #Then press cntrl + a, then cntrl + enter. The app should initialize.
 
 ####Packages####
@@ -20,7 +20,7 @@ round_df <- function(df, digits) {
 }
 
 ####Application#####
-r2<-pca(dat,screePlot=T,nFactorMethod = 'eigen')
+r2<-pca(dat,screePlot=T,nFactorMethod = 'eigen',eigen=T)
 
 #UI
 ui <- fluidPage(
@@ -49,22 +49,27 @@ ui <- fluidPage(
       
       #Outputs
       mainPanel(
-        textOutput('scree.text'),
+        tags$p(tags$h4(tags$strong('Scree Plot'))),
         
         plotOutput(outputId = 'scree',width = '100%')
       )),
       wellPanel(
-        textOutput('factor.text'),
+        htmlOutput('factor.text'),
         
         div(DT::dataTableOutput(outputId = 'factor.table'),
           style = "font-size: 100%; width: 45%")
       ),
       
       wellPanel(
-        textOutput('eigen.text'),
+        htmlOutput('eigen.text'),
         
         div(DT::dataTableOutput(outputId = 'eigen.table'),
-          style = "font-size: 100%; width: 95%")
+          style = "font-size: 100%; width: 95%"),
+        
+        tags$p(tags$h4(tags$strong('Initial Eigenvalue Table'))),
+        
+        div(DT::dataTableOutput(outputId = 'init.eigen'),
+          style = 'font-size: 100%; width: 95%')
       )
     ),
         tabPanel("Subscales",
@@ -77,20 +82,20 @@ ui <- fluidPage(
                 label='Run')),
             
             mainPanel(
-              textOutput('alpha.text'),
+              htmlOutput('alpha.text'),
               
               div(DT::dataTableOutput(outputId = 'alpha.table'),
                 style = "font-size: 90%; width: 45%")
           )
         ),
         wellPanel(
-          textOutput('scale.text'),
+          htmlOutput('scale.text'),
           
           div(DT::dataTableOutput(outputId = 'scale.table'),
             style = "font-size: 100%; width: 90%"),
         
         wellPanel(
-          textOutput('items.text'),
+          htmlOutput('items.text'),
           
           div(DT::dataTableOutput(outputId = 'item.table'),
               style = "font-size: 100%; width: 90%")
@@ -141,6 +146,11 @@ server <- function(input, output, session) {
         options = list(pageLength = e1()))
   })
   
+  output$init.eigen <- DT::renderDataTable({
+    DT::datatable(round_df(as.data.frame(r2$eigen$initEigen),digits=2),
+                  options = list(pageLength = ncol(dat)))
+  })
+  
   output$alpha.table <- DT::renderDataTable({
     round_df(alp()$total,digits = 3)
   })
@@ -164,36 +174,34 @@ server <- function(input, output, session) {
   })
   
   output$scree <- renderPlot({
-    r2$eigen
+    r2$eigen$screePlot
   })
   
   #Text
-  output$scree.text<- renderText({
-    'Scree Plot'
-  })
-  
   output$factor.text<- renderText({
-    paste('Factor Loadings on Principal Component Analysis of ',
-          e4(),' Factors',sep='')
+    HTML(paste('<h4><B>Factor Loadings on Principal Component Analysis of ',
+          e4(),' Factors</B></h4>',sep=''))
   })
   
   output$eigen.text<- renderText({
-    paste('Eigen Value Information for Principal Component Analysis of ',
-          e4(),' Factors',sep='')
+    HTML(paste('<h4><B>Eigen Value Information for Principal Component Analysis of ',
+          e4(),' Factors</h4></B>',sep=''))
   })
   
   output$alpha.text<- renderText({
-    paste("Cronbach's Alpha Criteria for Subscale ",e5(),sep='')
+    HTML(paste("<h4><B>Cronbach's Alpha Criteria for Subscale ",e5(),'</B></h4>',sep=''))
   })
   
   output$scale.text<- renderText({
-    paste("Alpha if Item Missing for Subscale ",e5(),sep='')
+    HTML(paste("<h4><B>Alpha if Item Dropped for Subscale ",e5(),'</B></h4>',sep=''))
   })
   
   output$items.text<- renderText({
-    paste("Item Statistics for Subscale ",e5(),sep='')
+    HTML(paste("<h4><B>Item Statistics for Subscale ",e5(),'</B></h4>',sep=''))
   })
 }
 
+po$eigen$initEigen
 
 shinyApp(ui, server)
+
