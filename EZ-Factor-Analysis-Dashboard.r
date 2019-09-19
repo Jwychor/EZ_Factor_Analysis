@@ -22,6 +22,8 @@ round_df <- function(df, digits) {
 ####Application#####
 r2<-pca(dat,screePlot=T,nFactorMethod = 'eigen',eigen=T)
 
+a<-alpha(dat)
+
 #UI
 ui <- fluidPage(
   
@@ -29,7 +31,9 @@ ui <- fluidPage(
   
     #Inputs
   tabsetPanel(
+    
     tabPanel("Factor",
+             
       sidebarLayout(
         sidebarPanel(
         sliderInput(inputId='factor',
@@ -37,7 +41,7 @@ ui <- fluidPage(
           value = 2, min = 1, max = ncol(dat), step = 1),
         
         sliderInput(inputId='loadings',
-          label = 'Hide Eigenvalues Below',
+          label = 'Hide Loadings Below',
           value = 0.59, min = 0, max = 1, step=.01),
         
         selectInput(inputId='rotation',
@@ -49,7 +53,7 @@ ui <- fluidPage(
       
       #Outputs
       mainPanel(
-        tags$p(tags$h4(tags$strong('Scree Plot'))),
+        htmlOutput('Scree.text'),
         
         plotOutput(outputId = 'scree',width = '100%')
       )),
@@ -59,17 +63,32 @@ ui <- fluidPage(
         div(DT::dataTableOutput(outputId = 'factor.table'),
           style = "font-size: 100%; width: 45%")
       ),
-      
       wellPanel(
-        htmlOutput('eigen.text'),
-        
         div(DT::dataTableOutput(outputId = 'eigen.table'),
-          style = "font-size: 100%; width: 95%"),
-        
-        tags$p(tags$h4(tags$strong('Initial Eigenvalue Table'))),
-        
-        div(DT::dataTableOutput(outputId = 'init.eigen'),
-          style = 'font-size: 100%; width: 95%')
+          style = "font-size: 100%; width: 95%")),
+      
+      sidebarLayout(
+        sidebarPanel(
+          htmlOutput('eigen.text'),
+            
+            tags$p(tags$h4(tags$strong('Initial Eigenvalue Table'))),
+            
+            div(DT::dataTableOutput(outputId = 'init.eigen'),
+              style = 'font-size: 100%; width: 95%')
+       ),
+
+        mainPanel(
+          htmlOutput('al.text'),
+          
+          tags$p(tags$h4(tags$strong("Scale Cronbach's Alpha"))),
+          
+          DT::dataTableOutput(outputId = 'al.table'),
+          
+          tags$p(tags$h4(tags$strong("Scale Item Statistics"))),
+          
+          DT::dataTableOutput(outputId = 'al.items')
+          
+      )
       )
     ),
         tabPanel("Subscales",
@@ -116,7 +135,6 @@ server <- function(input, output, session) {
   a1<-reactive({input$scale})
   
   e4<-eventReactive(input$button,{input$factor})
-  
   e5<-eventReactive(input$button2,{input$scale})
   
   r1<-eventReactive(input$button,{pca(dat,nFactorMethod='fixed',nFactors = e1(),hideLoadings=e2(),
@@ -151,8 +169,18 @@ server <- function(input, output, session) {
                   options = list(pageLength = ncol(dat)))
   })
   
+  output$al.table <- DT::renderDataTable({
+    DT::datatable(round_df(as.data.frame(a$total),digits=3),
+                  options = list(pageLength = 1))
+  })
+  
+  output$al.items <- DT::renderDataTable({
+    DT::datatable(round_df(as.data.frame(a$item.stats),digits=3),
+                  options = list(pageLength = ncol(dat)))
+  })
+  
   output$alpha.table <- DT::renderDataTable({
-    round_df(alp()$total,digits = 3)
+    DT::datatable(round_df(alp()$total,digits = 3))
   })
   
   output$scale.table <- DT::renderDataTable({
@@ -178,6 +206,10 @@ server <- function(input, output, session) {
   })
   
   #Text
+  output$scree.text<- renderText({
+    HTML(paste('<h4><B>Scree Plot</H4></B>'))
+  })
+  
   output$factor.text<- renderText({
     HTML(paste('<h4><B>Factor Loadings on Principal Component Analysis of ',
           e4(),' Factors</B></h4>',sep=''))
@@ -201,7 +233,7 @@ server <- function(input, output, session) {
   })
 }
 
-po$eigen$initEigen
+
 
 shinyApp(ui, server)
 
