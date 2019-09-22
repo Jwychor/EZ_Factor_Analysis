@@ -1,6 +1,6 @@
 ####Data Entry#####
 #replace 'name' with the name of a dataframe in your global environment
-dat <- os #<---- Replace
+dat <- name #<---- Replace
 #Then press cntrl + a, then cntrl + enter. The app should initialize.
 
 ####Packages####
