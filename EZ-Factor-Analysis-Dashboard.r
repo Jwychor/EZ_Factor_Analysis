@@ -9,6 +9,7 @@ dat <- name #<---- Replace
 require('dplyr')
 require('DT')
 require('jmv')
+require('psych')
 require('shiny')
 require('shinydashboard')
 round_df <- function(df, digits) {
