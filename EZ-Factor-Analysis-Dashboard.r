@@ -14,7 +14,6 @@ require('shiny')
 require('shinydashboard')
 round_df <- function(df, digits) {
   nums <- vapply(df, is.numeric, FUN.VALUE = logical(1))
-  
   df[,nums] <- round(df[,nums], digits = digits)
   
   (df)
@@ -23,7 +22,7 @@ round_df <- function(df, digits) {
 ####Application#####
 r2<-jmv::pca(dat,screePlot=T,nFactorMethod = 'eigen',eigen=T)
 
-a<-alpha(dat)
+a<-psych::alpha(dat)
 
 #UI
 ui <- fluidPage(
@@ -106,7 +105,10 @@ ui <- fluidPage(
                  htmlOutput('alpha.text'),
                  
                  div(DT::dataTableOutput(outputId = 'alpha.table'),
-                     style = "font-size: 90%; width: 45%")
+                     style = "font-size: 90%; width: 45%"),
+                 
+                 tags$p(tags$h4(tags$strong("Scale Items List"))),
+                 textOutput(outputId='alpha.names')
                )
              ),
              wellPanel(
@@ -155,10 +157,12 @@ server <- function(input, output, session) {
     dat[,colnames(dat) %in% m2()]
   )})
   
+  alpr<-reactive({paste(as.character(colnames(dat)[colnames(dat) %in% m2()]),sep='',collapse=',')})
+  
   output$factor.table <- DT::renderDataTable({
     DT::datatable(round_df(as.data.frame(r1()$loadings),digits=3),
                   options = list(pageLength = ncol(dat),
-                                 lengthMenu = c(5,10,15,round(1/2*ncol(dat),0),ncol(dat))))
+                                 lengthMenu = c(5,10,15,round(1/2*ncol(dat),0),ncol(dat))),rownames=F)
   })
   
   output$eigen.table <- DT::renderDataTable({
@@ -203,6 +207,10 @@ server <- function(input, output, session) {
     )
   })
   
+  output$alpha.names<-renderText({
+    alpr()
+  })
+  
   output$scree <- renderPlot({
     r2$eigen$screePlot
   })
@@ -235,7 +243,4 @@ server <- function(input, output, session) {
   })
 }
 
-
-
 shinyApp(ui, server)
-
