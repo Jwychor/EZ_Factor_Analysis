@@ -82,11 +82,9 @@ ui <- fluidPage(
                  htmlOutput('al.text'),
                  
                  tags$p(tags$h4(tags$strong("Scale Cronbach's Alpha"))),
-                 
                  DT::dataTableOutput(outputId = 'al.table'),
                  
                  tags$p(tags$h4(tags$strong("Scale Item Statistics"))),
-                 
                  DT::dataTableOutput(outputId = 'al.items')
                  
                )
@@ -105,13 +103,16 @@ ui <- fluidPage(
                  htmlOutput('alpha.text'),
                  
                  div(DT::dataTableOutput(outputId = 'alpha.table'),
-                     style = "font-size: 90%; width: 45%"),
+                     style = "font-size: 90%; width: 45%")
                  
-                 tags$p(tags$h4(tags$strong("Subscale Items List"))),
-                 textOutput(outputId='alpha.names')
                )
              ),
              wellPanel(
+               tags$p(tags$h4(tags$strong("Subscale Items List"))),
+               tags$head(tags$style(HTML("pre { overflow: auto; word-wrap: normal; }"))),
+               div(textOutput(outputId='alpha.names'),
+                   style = "font-size: 100%; width: 90%"),
+               
                htmlOutput('scale.text'),
                
                div(DT::dataTableOutput(outputId = 'scale.table'),
@@ -122,8 +123,8 @@ ui <- fluidPage(
                  
                  div(DT::dataTableOutput(outputId = 'item.table'),
                      style = "font-size: 100%; width: 90%")
-               )
-             )
+          )
+       )
     )
   )
 )
@@ -148,16 +149,14 @@ server <- function(input, output, session) {
   a2<-reactive({as.data.frame(r1()$loadings)})
   
   m1<-reactive({a2()[,c(1,(a1()+1))]})
-  
   n1<-reactive({subset(m1(),!is.na(m1()[,2]))})
-  
   m2<-reactive({n1()[,1]})
   
   alp<-eventReactive(input$button2,{alpha(
     dat[,colnames(dat) %in% m2()]
   )})
   
-  alpr<-reactive({paste(as.character(colnames(dat)[colnames(dat) %in% m2()]),sep='',collapse=',')})
+  alpr<-reactive({paste("'",as.character(colnames(dat)[colnames(dat) %in% m2()]),"'",sep="",collapse=",")})
   
   output$factor.table <- DT::renderDataTable({
     DT::datatable(round_df(as.data.frame(r1()$loadings),digits=3),
@@ -207,8 +206,8 @@ server <- function(input, output, session) {
     )
   })
   
-  output$alpha.names<-renderText({
-    alpr()
+  output$alpha.names<-renderPrint({
+    cat(paste(alpr()))
   })
   
   output$scree <- renderPlot({
@@ -242,6 +241,7 @@ server <- function(input, output, session) {
     HTML(paste("<h4><B>Item Statistics for Subscale ",e5(),'</B></h4>',sep=''))
   })
 }
+
 
 
 shinyApp(ui, server)
