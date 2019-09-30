@@ -107,7 +107,7 @@ ui <- fluidPage(
                  div(DT::dataTableOutput(outputId = 'alpha.table'),
                      style = "font-size: 90%; width: 45%"),
                  
-                 tags$p(tags$h4(tags$strong("Scale Items List"))),
+                 tags$p(tags$h4(tags$strong("Subscale Items List"))),
                  textOutput(outputId='alpha.names')
                )
              ),
@@ -242,5 +242,6 @@ server <- function(input, output, session) {
     HTML(paste("<h4><B>Item Statistics for Subscale ",e5(),'</B></h4>',sep=''))
   })
 }
+
 
 shinyApp(ui, server)
