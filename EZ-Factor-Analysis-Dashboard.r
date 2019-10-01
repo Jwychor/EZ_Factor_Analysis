@@ -12,6 +12,10 @@ require('psych')
 require('jmv')
 require('shiny')
 require('shinydashboard')
+require('ggplot2')
+require('ggcorrplot')
+require('Hmisc')
+
 round_df <- function(df, digits) {
   nums <- vapply(df, is.numeric, FUN.VALUE = logical(1))
   df[,nums] <- round(df[,nums], digits = digits)
@@ -20,9 +24,13 @@ round_df <- function(df, digits) {
 }
 
 ####Application#####
-r2<-jmv::pca(dat,screePlot=T,nFactorMethod = 'eigen',eigen=T)
+dats<- dat %>%
+  mutate_all(funs(scale))
 
-a<-psych::alpha(dat)
+datt<-dat[,-1]
+datn<-select_if(dat,is.numeric)
+datc<-round(cor(datn,use='pairwise.complete.obs'),2)
+pmat<-round(cor_pmat(datn),2)
 
 #UI
 ui <- fluidPage(
@@ -49,7 +57,11 @@ ui <- fluidPage(
                              choices=c('varimax','oblimin')),
                  
                  actionButton(inputId='button',
-                              label = 'Run')),
+                              label = 'Run'),
+               
+                 selectInput(inputId = 'column1',
+                             label = 'First Column is DV?',
+                             choices=c('No','Yes'))),
                
                #Outputs
                mainPanel(
@@ -125,26 +137,76 @@ ui <- fluidPage(
                      style = "font-size: 100%; width: 90%")
           )
        )
-    )
+    ),
+    tabPanel('Regression',
+              fluidRow(
+                column(1,
+                  wellPanel(
+                    checkboxGroupInput('reg.IV',
+                        label='IVs',
+                        choices=as.list(colnames(dat)),
+                        inline=F
+                      )
+                    )
+                ),
+                column(1,
+                wellPanel(radioButtons('reg.DV',
+                             label='DVs',
+                             choices=as.list(colnames(dat)),
+                             inline=F
+                    )
+                  )
+                ),
+                column(2,
+                  wellPanel(
+                      actionButton('reg.button',
+                          label='Run'),
+                      
+                      selectInput('reg.type',
+                          label='Type',
+                          choices=c('Standardized','Unstandardized'))
+                       )
+                    ),
+                column(8,
+                  wellPanel(
+                    tags$p(tags$h4(tags$strong("Linear Regression Table"))),
+                    
+                    div(DT::DTOutput(outputId='reg.table'),
+                      style = "font-size: 100%; width: 100%"
+                ),
+                  htmlOutput('reg.table2'),
+                  
+                  tags$p(tags$h4(tags$strong("Correlation Matrix (Non-significant Values Noted with an 'x')"))),
+                
+                  plotOutput('cor.plot',width='800px',height='700px')
+              )
+           )
+        )
+     )
   )
 )
 
+class(datt)
 
 #Server
 server <- function(input, output, session) {
   
+  #Reactives
   e1<-reactive({input$factor})
   e2<-reactive({input$loadings})
   e3<-reactive({input$rotation})
   
+  a<-reactive({psych::alpha(if(e6()=='No'){dat} else datt)})
   a1<-reactive({input$scale})
   
   e4<-eventReactive(input$button,{input$factor})
   e5<-eventReactive(input$button2,{input$scale})
+  e6<-reactive({as.character(input$column1)})
   
-  r1<-eventReactive(input$button,{jmv::pca(dat,nFactorMethod='fixed',nFactors = e1(),hideLoadings=e2(),
+  r1<-eventReactive(input$button,{jmv::pca(data=if(e6()=='No'){dat} else datt,nFactorMethod='fixed',nFactors = e1(),hideLoadings=e2(),
                                       screePlot=F,sortLoadings = T,eigen = T,rotation=e3(),
                                       factorSummary = T)})
+  r2<-reactive({jmv::pca(if(e6()=='No'){dat} else datt,screePlot=T,nFactorMethod = 'eigen',eigen=T)})
   
   a2<-reactive({as.data.frame(r1()$loadings)})
   
@@ -155,9 +217,36 @@ server <- function(input, output, session) {
   alp<-eventReactive(input$button2,{alpha(
     dat[,colnames(dat) %in% m2()]
   )})
-  
   alpr<-reactive({paste("'",as.character(colnames(dat)[colnames(dat) %in% m2()]),"'",sep="",collapse=",")})
   
+  l1<-reactive({as.character(input$reg.IV)})
+  l2<-reactive({as.character(input$reg.DV)})
+  l3<-eventReactive(input$reg.button,{
+    u<-paste(l1(),collapse='+',sep='')
+    u1<-vector(mode='character',length=length(l1()))
+    if(input$reg.type=='Standardized'){
+      u1<-paste("lm(",l2(),'~',u,",data=dats)")
+    }
+    else{
+      u1<-paste("lm(",l2(),'~',u,",data=dat)")
+    }
+    u2<-eval(parse(text=u1))
+    u3<-summary(u2)
+  })
+    
+  #Outputs
+  output$cor.plot<-renderPlot({ggcorrplot(datc,outline.color='black',type='lower',
+                 lab=T,p.mat=pmat,ggtheme=ggplot2::theme_bw(),
+                 lab_col = 'black',sig.level = .05,insig='pch',pch='x')})
+  
+  output$reg.table<-DT::renderDataTable(
+    DT::datatable(round_df(as.data.frame(l3()$coefficients),digits = 3),
+                  options = list(pageLength = 100)))
+
+  output$reg.table2<-renderText({HTML(paste("R-Squared = <u>",round(l3()$r.squared,3),
+    "</u><br>F(",round(l3()$fstatistic[2],3),',',round(l3()$fstatistic[3],3),') = <u>',round(l3()$fstatistic[1],3),'</u><br>',
+    "<br><b>Note:</b> F > 2.98 is significant at p < 0.05</br>",sep=''))})
+
   output$factor.table <- DT::renderDataTable({
     DT::datatable(round_df(as.data.frame(r1()$loadings),digits=3),
                   options = list(pageLength = ncol(dat),
@@ -170,17 +259,17 @@ server <- function(input, output, session) {
   })
   
   output$init.eigen <- DT::renderDataTable({
-    DT::datatable(round_df(as.data.frame(r2$eigen$initEigen),digits=2),
+    DT::datatable(round_df(as.data.frame(r2()$eigen$initEigen),digits=2),
                   options = list(pageLength = ncol(dat)))
   })
   
   output$al.table <- DT::renderDataTable({
-    DT::datatable(round_df(as.data.frame(a$total),digits=3),
+    DT::datatable(round_df(as.data.frame(a()$total),digits=3),
                   options = list(pageLength = 1))
   })
   
   output$al.items <- DT::renderDataTable({
-    DT::datatable(round_df(as.data.frame(a$item.stats),digits=3),
+    DT::datatable(round_df(as.data.frame(a()$item.stats),digits=3),
                   options = list(pageLength = ncol(dat)))
   })
   
@@ -211,7 +300,7 @@ server <- function(input, output, session) {
   })
   
   output$scree <- renderPlot({
-    r2$eigen$screePlot
+    r2()$eigen$screePlot
   })
   
   #Text
