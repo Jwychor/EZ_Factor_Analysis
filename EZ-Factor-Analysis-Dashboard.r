@@ -245,7 +245,7 @@ server <- function(input, output, session) {
 
   output$reg.table2<-renderText({HTML(paste("R-Squared = <u>",round(l3()$r.squared,3),
     "</u><br>F(",round(l3()$fstatistic[2],3),',',round(l3()$fstatistic[3],3),') = <u>',round(l3()$fstatistic[1],3),'</u><br>',
-    "<br><b>Note:</b> F > 2.98 is significant at p < 0.05</br>",sep=''))})
+    "<br><b>Note:</b> p-values coming soon!</br>",sep=''))})
 
   output$factor.table <- DT::renderDataTable({
     DT::datatable(round_df(as.data.frame(r1()$loadings),digits=3),
