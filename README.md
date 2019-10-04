@@ -21,3 +21,6 @@ jmv
 psych
 shiny
 shinydashboard
+ggplot2
+ggcorrplot
+Hmisc
