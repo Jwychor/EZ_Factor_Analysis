@@ -3,14 +3,19 @@
 #then choose a dataframe from your global environment from the drop downlist 
 #in the top left corner to get started.
 
+####Options####
+#Remove Scientific Notation
+options(scipen=999)
+
 ####Packages####
-#The code on line 10 installs packages that have not yet been installed
+#The code on line 13 installs packages that have not yet been installed
 
 load.lib<-c('rlang','dplyr','DT','psych','jmv','shiny','shinydashboard','ggplot2','ggcorrplot')
 install.lib<-load.lib[!load.lib %in% installed.packages()];for(lib in install.lib) install.packages(lib,dependencies=TRUE,verbose=F,quiet=T);install.lib
 
 sapply(load.lib,library,character=TRUE)
 
+#Custom Function Used Later
 round_df <- function(df, digits) {
   nums <- vapply(df, is.numeric, FUN.VALUE = logical(1))
   df[,nums] <- round(df[,nums], digits = digits)
@@ -79,7 +84,7 @@ server <- function(input, output, session) {
   #Outputs
   output$cor.plot<-renderPlot({ggcorrplot(datc(),outline.color='black',type='lower',
                                           lab=T,p.mat=pmat(),ggtheme=ggplot2::theme_bw(),
-                                          lab_col = 'black',sig.level = .05,insig='pch',pch='x')})
+                                          lab_col = 'black',sig.level = .05,insig='blank')})
   
   output$reg.table<-DT::renderDataTable(
     DT::datatable(round_df(as.data.frame(l3()$coefficients),digits = 3),
@@ -343,9 +348,9 @@ ui <- fluidPage(
                         ),
                         htmlOutput('reg.table2'),
                         
-                        tags$p(tags$h4(tags$strong("Correlation Matrix (Non-significant Values Noted with an 'x')"))),
+                        tags$p(tags$h4(tags$strong("Correlation Matrix (Non-significant Values at p > .05 are Left Blank)"))),
                         
-                        plotOutput('cor.plot',width='700px',height='800px')
+                        plotOutput('cor.plot',width='650px',height='800px')
                       )
                )
           )
