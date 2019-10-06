@@ -1,6 +1,9 @@
 # EZ-Factor-Analysis Dashboard
 Interactive R - Shiny dashboard for factor analysis.
 
+# Update
+The 2.0 version of the app only requires that the data be in the global environment prior to startup.
+
 
 # Usage and Description
 Near the top line, replace the string 'name' with the name of a dataframe in your global environment.
