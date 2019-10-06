@@ -25,7 +25,7 @@ temp<-names(Filter(function(x) is(x, "data.frame"), mget(ls())))
 server <- function(input, output, session) {
   
   #Reactives
-  dat<-reactive({get(input$dataname)})
+  dat<-reactive({get(input$dataname,envir = global_env())})
   dats<-reactive({dat() %>%
       mutate_all(funs(scale))})
   
