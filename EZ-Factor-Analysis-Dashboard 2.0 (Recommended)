@@ -30,6 +30,7 @@ temp<-names(Filter(function(x) is(x, "data.frame"), mget(ls())))
 server <- function(input, output, session) {
   
   #Reactives
+  b1<-reactive({as.data.frame(matrix(c('Scales Need to have >2 Items for Scale Statistics')))})
   dat<-reactive({get(input$dataname,envir = global_env())})
   dats<-reactive({dat() %>%
       mutate_all(funs(scale))})
@@ -43,7 +44,7 @@ server <- function(input, output, session) {
   e2<-reactive({input$loadings})
   e3<-reactive({input$rotation})
   e4<-eventReactive(input$button,{input$factor})
-  e5<-eventReactive(input$button2,{input$scale})
+  e5<-reactive({input$scale})
   e6<-reactive({as.character(input$column1)})
   e7<-reactive({as.character(input$reg.inter)})
   
@@ -60,10 +61,12 @@ server <- function(input, output, session) {
   m1<-reactive({a2()[,c(1,(a1()+1))]})
   n1<-reactive({subset(m1(),!is.na(m1()[,2]))})
   m2<-reactive({n1()[,1]})
+
+  alp<-reactive({
+      psych::alpha(
+      dat()[,colnames(dat()) %in% m2()])
+    })
   
-  alp<-eventReactive(input$button2,{alpha(
-    dat()[,colnames(dat()) %in% m2()]
-  )})
   alpr<-reactive({paste("'",as.character(colnames(dat())[colnames(dat()) %in% m2()]),"'",sep="",collapse=",")})
   
   l1<-reactive({as.character(input$reg.IV)})
@@ -120,18 +123,34 @@ server <- function(input, output, session) {
                   options = list(pageLength = ncol(dat())))
   })
   
+  
   output$alpha.table <- DT::renderDataTable({
-    DT::datatable(round_df(alp()$total,digits = 3))
+    if(length(m2())>2){
+      DT::datatable(round_df(alp()$total,digits = 3))
+    }
+    else{
+      DT::datatable(b1())
+    }
   })
   
   output$scale.table <- DT::renderDataTable({
-    DT::datatable(round_df(alp()$alpha.drop,digits = 3),
+    if(length(m2())>2){
+      DT::datatable(round_df(alp()$alpha.drop,digits = 3),
                   options = list(pageLength = 100))
+    }
+    else{
+      DT::datatable(b1())
+    }
   })
   
   output$item.table <- DT::renderDataTable({
-    DT::datatable(round_df(alp()$item.stats,digits = 3),
+    if(length(m2())>2){
+      DT::datatable(round_df(alp()$item.stats,digits = 3),
                   options = list(pageLength = 100))
+    }
+    else{
+      DT::datatable(b1())
+    }
   })
   
   output$a.slider<-renderUI({
@@ -140,6 +159,7 @@ server <- function(input, output, session) {
                   label='Subscale Number',
                   value = 1, min = 1, max = input$factor,step = 1)
     )
+    
   })
   
   output$datanameo<-renderUI({tagList(selectInput(inputId = 'dataname',
@@ -279,10 +299,8 @@ ui <- fluidPage(
              sidebarLayout(
                sidebarPanel(
                  
-                 uiOutput('a.slider'),
-                 
-                 actionButton(inputId = 'button2',
-                              label='Run')),
+                 uiOutput('a.slider')
+                 ),
                
                mainPanel(
                  htmlOutput('alpha.text'),
@@ -357,8 +375,6 @@ ui <- fluidPage(
     )
   )
 )
-
-
 
 
 shinyApp(ui, server)
