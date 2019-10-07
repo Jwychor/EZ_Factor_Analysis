@@ -329,7 +329,7 @@ ui <- fluidPage(
              )
     ),
     tabPanel('Regression',
-        tags$p(tags$h3(tags$strong("Choose the IVs and DV for Linear Regression"))),
+        tags$p(tags$h3(tags$strong("Choose Linear Regression Settings and Press 'Run' to get Started"))),
              
              fluidRow(
                column(2,
@@ -346,16 +346,16 @@ ui <- fluidPage(
                ),
                column(2,
                       wellPanel(
-                        actionButton('reg.button',
-                                     label='Run'),
-                        
                         selectInput('reg.type',
                                     label='Type',
                                     choices=c('Standardized','Unstandardized')),
                         
                         selectInput('reg.inter',
                                     label='Include all Interactions?',
-                                    choice=c('No','Yes'))
+                                    choice=c('No','Yes')),
+                        
+                        actionButton('reg.button',
+                                     label='Run')
                       )
                ),
                column(6,
