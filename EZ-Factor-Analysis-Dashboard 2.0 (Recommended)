@@ -206,9 +206,6 @@ server <- function(input, output, session) {
   })
   
   #Text
-  output$scree.text<- renderText({
-    HTML(paste('<h4><B>Scree Plot</H4></B>'))
-  })
   
   output$factor.text<- renderText({
     HTML(paste('<h4><B>Factor Loadings on Principal Component Analysis of ',
@@ -241,6 +238,7 @@ ui <- fluidPage(
   tabsetPanel(
     
     tabPanel("Factor",
+             tags$p(tags$h3(tags$strong("Choose a Dataframe, PCA Settings, and Press 'Run' to get Started"))),
              
              sidebarLayout(
                sidebarPanel(
@@ -252,13 +250,13 @@ ui <- fluidPage(
                  
                  uiOutput('rotationo'),
                  
-                 uiOutput('buttono'),
-                 
-                 uiOutput('column1o')),
+                 uiOutput('column1o'),
+               
+                 uiOutput('buttono')),
                
                #Outputs
                mainPanel(
-                 htmlOutput('Scree.text'),
+                 tags$p(tags$h4(tags$strong("Scree Plot"))),
                  
                  plotOutput(outputId = 'scree',width = '100%')
                )
@@ -296,6 +294,7 @@ ui <- fluidPage(
              )
     ),
     tabPanel("Subscales",
+             tags$p(tags$h3(tags$strong("Press 'Run' in the 'Factor' Tab to Analyze Subscales"))),
              sidebarLayout(
                sidebarPanel(
                  
