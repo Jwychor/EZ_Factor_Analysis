@@ -163,7 +163,7 @@ server <- function(input, output, session) {
   })
   
   output$datanameo<-renderUI({tagList(selectInput(inputId = 'dataname',
-                                        label = 'Select the Dataframe',
+                                        label = 'Select a Dataframe',
                                         choices=c(temp)))})
   
   output$factoro<-renderUI({tagList(sliderInput(inputId='factor',
@@ -192,7 +192,7 @@ server <- function(input, output, session) {
   ))})
   
   output$reg.DVo<-renderUI({tagList(radioButtons('reg.DV',
-               label='DVs',
+               label='DV',
                choices=as.list(colnames(dat())),
                inline=F
   ))})
@@ -329,6 +329,8 @@ ui <- fluidPage(
              )
     ),
     tabPanel('Regression',
+        tags$p(tags$h3(tags$strong("Choose the IVs and DV for Linear Regression"))),
+             
              fluidRow(
                column(2,
                       wellPanel(
