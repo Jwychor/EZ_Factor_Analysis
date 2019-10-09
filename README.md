@@ -2,7 +2,7 @@
 Interactive R - Shiny dashboard for factor analysis.
 
 # Update
-The 2.0 version of the app only requires that the data be in the global environment prior to startup.
+The 2.0 version of the app only requires that dataframes to be analyzed be in the global environment prior to startup.
 
 
 # Usage and Description
