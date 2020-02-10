@@ -2,3 +2,7 @@ Package: EZFactorAnalysis
 Version: 0.1
 License: GPL-3
 Author: Jack Wychor
+Date: 2020-02-10
+Title: Jack Wychor EZFA
+Description: Launches EZFA Dashboard. Only works with Dataframes.
+Maintainer: Jack Wychor
