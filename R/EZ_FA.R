@@ -6,7 +6,7 @@ EZ_FA<-function(){
   ####Packages####
   #The code on line 13 installs packages that have not yet been installed
 
-  load.lib<-c('rlang','dplyr','DT','psych','jmv','shiny','shinydashboard','ggplot2','ggcorrplot')
+  load.lib<-c('rlang','dplyr','DT','psych','jmvcore','shiny','shinydashboard','ggplot2','ggcorrplot')
   install.lib<-load.lib[!load.lib %in% installed.packages()];for(lib in install.lib) install.packages(lib,dependencies=TRUE,verbose=F,quiet=T);install.lib
 
   sapply(load.lib,library,character=TRUE)
