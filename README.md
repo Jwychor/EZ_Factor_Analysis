@@ -1,4 +1,4 @@
-# EZ-Factor-Analysis Dashboard
+# EZ Factor Analysis Dashboard
 Interactive R - Shiny dashboard for factor analysis, subscale reliability, linear regression, and correlational analysis.
 
 # Important
