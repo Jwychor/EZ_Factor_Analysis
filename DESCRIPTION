@@ -8,10 +8,11 @@ Description: Launches EZFA Dashboard. Only works with Dataframes.
 Maintainer: Jack Wychor <jack.wychor@mnsu.edu>
 Depends:
   dplyr,
-  DT,
-  psych,
   ggplot2,
   ggcorrplot,
-  jmvcore,
   rlang,
   shiny
+Imports:
+  DT,
+  psych,
+  jmv
