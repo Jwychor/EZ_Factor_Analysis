@@ -32,10 +32,12 @@ Functions from the following packages are required to be installed and required 
 ```
 dplyr
 DT
-jmvcore
-psych
-shiny
-shinydashboard
+devtools
 ggplot2
 ggcorrplot
+jmvcore
+psych
+Rlang
+shiny
+shinydashboard
 ```
