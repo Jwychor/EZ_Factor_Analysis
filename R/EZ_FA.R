@@ -1,3 +1,4 @@
+{
 ####Options####
 #Remove Scientific Notation
 options(scipen=999)
@@ -370,7 +371,7 @@ ui <- fluidPage(
     )
   )
 )
-
+}
 EZ_FA<-function(){
   shinyApp(ui, server)
 }
