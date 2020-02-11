@@ -12,7 +12,7 @@ if(!'devtools' %in% installed.packages()){
 }
 require('devtools')
 install_github("Jwychor/EZ_Factor_Analysis")
-packs<-('shiny','rlang','dplyr','DT','jmvcore','shiny','ggplot2','ggcorrplot','psych')
+packs<-c('shiny','rlang','dplyr','DT','jmvcore','shiny','ggplot2','ggcorrplot','psych')
 sapply(packs,library,character=T)
 require('EZFactorAnalysis')
 EZ_FA()
