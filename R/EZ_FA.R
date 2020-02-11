@@ -46,7 +46,7 @@ EZ_FA<-function(){
     a<-reactive({psych::alpha(if(e6()=='No'){dat()} else datt())})
     a1<-reactive({input$scale})
     
-    r1<-eventReactive(input$button,{jmv::pca(data=if(e6()=='No'){dat()} else datt(),nFactorMethod='fixed',nFactors = e1(),hideLoadings=e2(),
+    r1<-eventReactive(input$button,{jmvcore::pca(data=if(e6()=='No'){dat()} else datt(),nFactorMethod='fixed',nFactors = e1(),hideLoadings=e2(),
                                              screePlot=F,sortLoadings = T,eigen = T,rotation=e3(),
                                              factorSummary = T)})
     r2<-reactive({jmv::pca(if(e6()=='No'){dat()} else datt(),screePlot=T,nFactorMethod = 'eigen',eigen=T)})
