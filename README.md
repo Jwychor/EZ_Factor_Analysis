@@ -1,5 +1,5 @@
 # EZ-Factor-Analysis Dashboard
-Interactive R - Shiny dashboard for factor analysis, subscale reliability, and 
+Interactive R - Shiny dashboard for factor analysis, subscale reliability, linear regression, and correlational analysis.
 
 # Important
 The 2.0 version of the app only requires that dataframes to be analyzed be in the global environment prior to startup.
