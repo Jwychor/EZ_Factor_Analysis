@@ -6,13 +6,13 @@ The 2.0 version of the app only requires that dataframes to be analyzed be in th
 
 # Usage and Description
 The following code will install and instiatiate the dashboard. 
-```if(!'devtools' %in% installed.packages()){```
-  ```install.packages('devtools')```
-```}```
-```require('devtools')```
-```install_github("Jwychor/EZ_Factor_Analysis")```
-```require(EZFactorAnalysis)```
-```EZ_FA()```
+`if(!'devtools' %in% installed.packages()){
+  install.packages('devtools')
+}
+require('devtools')
+install_github("Jwychor/EZ_Factor_Analysis")
+require(EZFactorAnalysis)
+EZ_FA()`
 
 The dashboard can access all dataframes in the current global environment.
 
