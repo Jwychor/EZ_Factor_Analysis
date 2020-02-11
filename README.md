@@ -40,7 +40,7 @@ DT
 devtools
 ggplot2
 ggcorrplot
-jmvcore
+jmv
 psych
 Rlang
 shiny
