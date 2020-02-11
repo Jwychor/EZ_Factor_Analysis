@@ -17,6 +17,9 @@ EZ_FA()
 ```
 The dashboard can access all dataframes in the current global environment. Closing the application will allow the user to access R functionality again. To open the dashboard, execute ```EZ_FA()``` again.
 
+### NOTE: 
+Non-numeric columns in data frames will be ignored. Errors and warnings thrown during use will not stop the application. These will be displayed in the R Studio console.
+
 ## Factor Analysis
 The app includes 3 panels: In the factor panel, there is a Scree-plot, a sliding bar indicating the number of factors to be used in a principal component analysis, a sliding bar indicating what number to hide loadings at, and a choice between a "varimax" and "oblimin" rotated principal component analysis, scale Cronbach's Alpha, and scale item statistics. Finally, if the 1st column in the dataframe is a dependent variable, it can be excluded from the analysis with the ```First Column is DV?``` box changed to "Yes".
 
