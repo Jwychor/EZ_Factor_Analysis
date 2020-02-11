@@ -1,13 +1,20 @@
 # EZ-Factor-Analysis Dashboard
-Interactive R - Shiny dashboard for factor analysis.
+Interactive R - Shiny dashboard for factor analysis, subscale reliability, and 
 
-# Update
+# Important
 The 2.0 version of the app only requires that dataframes to be analyzed be in the global environment prior to startup.
 
-
 # Usage and Description
-Near the top line, replace the string 'name' with the name of a dataframe in your global environment.
-Then press ```cntrl``` + ```a```, then ```cntrl``` + ```enter```. The app should initialize.
+The following code will install and instiatiate the dashboard. 
+```if(!'devtools' %in% installed.packages()){
+  install.packages('devtools')
+}
+require('devtools')
+install_github("Jwychor/EZ_Factor_Analysis")
+require(EZFactorAnalysis)
+EZ_FA()```
+
+The dashboard can access all dataframes in the current global environment.
 
 ## Factor Analysis
 The app includes 2 panels: In the factor panel, there is a Scree-plot, a sliding bar indicating the number of factors to be used in a principal component analysis, a sliding bar indicating what number to hide loadings at, and a choice between a "varimax" and "oblimin" rotated principal component analysis, scale Cronbach's Alpha, and scale item statistics. Finally, if the 1st column in the dataframe is a dependent variable, it can be excluded from the analysis with the ```First Column is DV?``` box changed to "Yes".
