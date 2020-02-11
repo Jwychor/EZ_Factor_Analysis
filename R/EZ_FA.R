@@ -4,7 +4,7 @@ EZ_FA<-function(){
   options(scipen=999)
   
   ####Packages####
-  load.lib<-c('rlang','dplyr','DT','psych','jmvcore','shiny','shinydashboard','ggplot2','ggcorrplot')
+  load.lib<-c('rlang','dplyr','DT','psych','jmv','shiny','shinydashboard','ggplot2','ggcorrplot')
   
   install.lib<-load.lib[!load.lib %in% installed.packages()];if(exists("install.lib")){for(lib in install.lib) install.packages(lib,dependencies=TRUE,verbose=F,quiet=T);install.lib;}
   
@@ -46,10 +46,10 @@ EZ_FA<-function(){
     a<-reactive({psych::alpha(if(e6()=='No'){dat()} else datt())})
     a1<-reactive({input$scale})
     
-    r1<-eventReactive(input$button,{jmvcore::pca(data=if(e6()=='No'){dat()} else datt(),nFactorMethod='fixed',nFactors = e1(),hideLoadings=e2(),
-                                             screePlot=F,sortLoadings = T,eigen = T,rotation=e3(),
-                                             factorSummary = T)})
-    r2<-reactive({jmvcore::pca(if(e6()=='No'){dat()} else datt(),screePlot=T,nFactorMethod = 'eigen',eigen=T)})
+    r1<-eventReactive(input$button,{jmv::pca(data=if(e6()=='No'){dat()} else datt(),nFactorMethod='fixed',nFactors = e1(),hideLoadings=e2(),
+                                                 screePlot=F,sortLoadings = T,eigen = T,rotation=e3(),
+                                                 factorSummary = T)})
+    r2<-reactive({jmv::pca(if(e6()=='No'){dat()} else datt(),screePlot=T,nFactorMethod = 'eigen',eigen=T)})
     
     a2<-reactive({as.data.frame(r1()$loadings)})
     
