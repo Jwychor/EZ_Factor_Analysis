@@ -12,7 +12,9 @@ if(!'devtools' %in% installed.packages()){
 }
 require('devtools')
 install_github("Jwychor/EZ_Factor_Analysis")
-require(EZFactorAnalysis)
+packs<-('shiny','rlang','dplyr','DT','jmvcore','shiny','ggplot2','ggcorrplot','psych')
+sapply(packs,library,character=T)
+require('EZFactorAnalysis')
 EZ_FA()
 ```
 The dashboard can access all dataframes in the current global environment. Closing the application will allow the user to access R functionality again. To open the dashboard, execute ```EZ_FA()``` again.
@@ -42,5 +44,4 @@ jmvcore
 psych
 Rlang
 shiny
-shinydashboard
 ```
