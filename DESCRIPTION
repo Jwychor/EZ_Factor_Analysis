@@ -13,5 +13,5 @@ Depends:
   ggplot2,
   ggcorrplot,
   jmvcore,
-  Rlang,
+  rlang,
   shiny
