@@ -49,7 +49,7 @@ EZ_FA<-function(){
     r1<-eventReactive(input$button,{jmvcore::pca(data=if(e6()=='No'){dat()} else datt(),nFactorMethod='fixed',nFactors = e1(),hideLoadings=e2(),
                                              screePlot=F,sortLoadings = T,eigen = T,rotation=e3(),
                                              factorSummary = T)})
-    r2<-reactive({jmv::pca(if(e6()=='No'){dat()} else datt(),screePlot=T,nFactorMethod = 'eigen',eigen=T)})
+    r2<-reactive({jmvcore::pca(if(e6()=='No'){dat()} else datt(),screePlot=T,nFactorMethod = 'eigen',eigen=T)})
     
     a2<-reactive({as.data.frame(r1()$loadings)})
     
