@@ -10,7 +10,7 @@ The following code will install and instiatiate the dashboard.
 if(!'devtools' %in% installed.packages()){
   install.packages('devtools')
 }
-require('devtools')
+library('devtools')
 install_github("Jwychor/EZ_Factor_Analysis")
 packs<-c('shiny','rlang','dplyr','DT','jmv','shiny','ggplot2','ggcorrplot','psych','EZFactorAnalysis')
 sapply(packs,library,character=T)
