@@ -2,7 +2,8 @@
 Interactive R - Shiny dashboard for factor analysis, subscale reliability, linear regression, and correlational analysis.
 
 # Important
-The 2.0 version of the app only requires that dataframes to be analyzed be in the global environment prior to startup.
+Only works in R version >= 3.6.2.
+Dataframes to be analyzed must be in the global environment prior to startup.
 
 # Usage and Description
 The following code will install and instiatiate the dashboard. 
