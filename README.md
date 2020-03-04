@@ -17,7 +17,7 @@ if(!'devtools' %in% installed.packages()){
 library('devtools')
 install_github("Jwychor/EZ_Factor_Analysis")
 packs<-c('shiny','rlang','dplyr','DT','jmv','shiny','ggplot2','ggcorrplot','psych','EZFA')
-sapply(packs,library,character=T)
+sapply(packs,library,character = T)
 EZ_FA()
 ```
 The dashboard can access all dataframes in the current global environment. Closing the application will allow the user to access R functionality again. To open the dashboard, execute ```EZ_FA()``` again.
