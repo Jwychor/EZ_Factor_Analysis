@@ -40,13 +40,13 @@ In the regression tab, there is a list of each variable in the selected datafram
 # Dependencies
 Functions from the following packages are required to be installed and required on your machine before this code will run:
 ```
-dplyr
+Rlang
 DT
 devtools
-ggplot2
-ggcorrplot
 jmv
+tidyverse
 psych
-Rlang
 shiny
+ggcorrplot
+
 ```
