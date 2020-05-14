@@ -1,6 +1,8 @@
 # EZ Factor Analysis Dashboard
 Interactive R - Shiny dashboard for factor analysis, subscale reliability, linear regression, and correlational analysis.
 
+![image](https://github.com/Jwychor/EZ_Factor_Analysis/blob/master/Images/EZ_FA%20Page%201.JPG)
+
 # Important
 Only works in R version >= 3.6.2.
 Dataframes to be analyzed must be in the global environment prior to startup.
