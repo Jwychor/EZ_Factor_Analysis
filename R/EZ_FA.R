@@ -4,7 +4,7 @@ EZ_FA<-function(){
   options(scipen=999)
   
   ####Packages####
-  load.lib<-c('rlang','dplyr','DT','psych','jmv','shiny','shinydashboard','ggplot2','ggcorrplot')
+  load.lib<-c('rlang','DT','psych','jmv','shiny','shinydashboard','tidyverse','ggcorrplot')
   
   install.lib<-load.lib[!load.lib %in% installed.packages()];if(exists("install.lib")){for(lib in install.lib) install.packages(lib,dependencies=TRUE,verbose=F,quiet=T);install.lib;}
   
