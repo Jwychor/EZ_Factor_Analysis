@@ -8,16 +8,17 @@ Dataframes to be analyzed must be in the global environment prior to startup.
 # Usage and Description
 The following code will install and instiatiate the dashboard. 
 ```R
+if(!'remotes' %in% installed.packages()){
+  install.packages('remotes',dependencies = T)
+}
 if(!'rlang' %in% installed.packages()){
-  install.packages('rlang',dependencies = T)
+  remotes::install_github('r-lib/rlang',dependencies = T)
 }
-if(!'devtools' %in% installed.packages()){
-  install.packages('devtools',dependencies = T)
-}
-library('devtools')
-install_github("Jwychor/EZ_Factor_Analysis")
+library('remotes')
+remotes::install_github("Jwychor/EZ_Factor_Analysis",update = 'ask')
 packs<-c('shiny','rlang','tidyverse','DT','jmv','shiny','ggcorrplot','psych','EZFA')
 sapply(packs,library,character = T)
+
 EZ_FA()
 ```
 The dashboard can access all dataframes in the current global environment. Closing the application will allow the user to access R functionality again. To use the dashboard in future files use 
