@@ -9,7 +9,6 @@ Maintainer: Jack Wychor <jack.wychor@mnsu.edu>
 Depends:
   tidyverse,
   ggcorrplot,
-  rlang,
   shiny
 Imports:
   DT,
