@@ -4,9 +4,7 @@ EZ_FA<-function(){
   options(scipen=999)
   
   ####Packages####
-  load.lib<-c('rlang','DT','psych','jmv','shiny','shinydashboard','tidyverse','ggcorrplot')
-  
-  install.lib<-load.lib[!load.lib %in% installed.packages()];if(exists("install.lib")){for(lib in install.lib) install.packages(lib,dependencies=TRUE,verbose=F,quiet=T);install.lib;}
+  load.lib<-c('rlang','DT','psych','jmv','shiny','tidyverse','ggcorrplot')
   
   sapply(load.lib,library,character=TRUE)
   
@@ -18,7 +16,7 @@ EZ_FA<-function(){
     (df)
   }
   
-  temp<<-names(Filter(function(x) is(x, "data.frame"), mget(ls(global_env()),env=global_env())))
+  temp<-names(Filter(function(x) is(x, "data.frame"), mget(ls(rlang::global_env()),env=rlang::global_env())))
   
   ####Application#####
   #Server
@@ -47,8 +45,8 @@ EZ_FA<-function(){
     a1<-reactive({input$scale})
     
     r1<-eventReactive(input$button,{jmv::pca(data=if(e6()=='No'){dat()} else datt(),nFactorMethod='fixed',nFactors = e1(),hideLoadings=e2(),
-                                                 screePlot=F,sortLoadings = T,eigen = T,rotation=e3(),
-                                                 factorSummary = T)})
+                                             screePlot=F,sortLoadings = T,eigen = T,rotation=e3(),
+                                             factorSummary = T)})
     r2<-reactive({jmv::pca(if(e6()=='No'){dat()} else datt(),screePlot=T,nFactorMethod = 'eigen',eigen=T)})
     
     a2<-reactive({as.data.frame(r1()$loadings)})
