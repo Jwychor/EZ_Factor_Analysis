@@ -18,7 +18,7 @@ EZ_FA<-function(){
     (df)
   }
   
-  temp<-names(Filter(function(x) is(x, "data.frame"), mget(ls(global_env()),env=global_env())))
+  temp<<-names(Filter(function(x) is(x, "data.frame"), mget(ls(global_env()),env=global_env())))
   
   ####Application#####
   #Server
