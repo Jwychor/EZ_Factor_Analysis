@@ -20,7 +20,16 @@ packs<-c('shiny','rlang','tidyverse','DT','jmv','shiny','ggcorrplot','psych','EZ
 sapply(packs,library,character = T)
 EZ_FA()
 ```
-The dashboard can access all dataframes in the current global environment. Closing the application will allow the user to access R functionality again. To open the dashboard, execute ```EZ_FA()``` again.
+The dashboard can access all dataframes in the current global environment. Closing the application will allow the user to access R functionality again. To use the dashboard in future files use 
+```
+library(EZFA)
+
+``` 
+to add the package to the required libraries and
+```
+EZ_FA()
+````
+to open the dashboard.
 
 ### NOTE: 
 Non-numeric columns in data frames will be ignored. Errors and warnings thrown during use will not stop the application. These will be displayed in the R Studio console.
