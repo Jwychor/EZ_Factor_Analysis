@@ -20,6 +20,8 @@ library(EZFA)
 
 EZ_FA()
 ```
+If the console prompts you to install new versions of dependencies that are already installed, this is not necessary and entering "3" (none) when prompted is fine.
+
 The dashboard can access all dataframes in the current global environment. Closing the application will allow the user to access R functionality again. To use the dashboard in future files use 
 ```
 library(EZFA)
