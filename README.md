@@ -15,9 +15,8 @@ if(!'rlang' %in% installed.packages()){
   remotes::install_github('r-lib/rlang',dependencies = T)
 }
 library('remotes')
-remotes::install_github("Jwychor/EZ_Factor_Analysis",update = 'ask')
-packs<-c('shiny','rlang','tidyverse','DT','jmv','shiny','ggcorrplot','psych','EZFA')
-sapply(packs,library,character = T)
+remotes::install_github("Jwychor/EZ_Factor_Analysis",update = "ask")
+library(EZFA)
 
 EZ_FA()
 ```
