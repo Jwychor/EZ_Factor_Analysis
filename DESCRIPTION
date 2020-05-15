@@ -7,6 +7,7 @@ Title: Jack Wychor EZFA
 Description: Launches EZFA Dashboard. Only works with Dataframes.
 Maintainer: Jack Wychor <jack.wychor@mnsu.edu>
 Depends:
+  rlang,
   tidyverse,
   ggcorrplot,
   shiny
