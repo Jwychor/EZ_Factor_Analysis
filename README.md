@@ -16,7 +16,7 @@ if(!'rlang' %in% installed.packages()){
 }
 library('remotes')
 remotes::install_github("Jwychor/EZ_Factor_Analysis",dependencies=T,update = "ask")
-library(EZFA)
+library('EZFA')
 
 EZ_FA()
 ```
