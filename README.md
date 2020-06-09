@@ -6,7 +6,7 @@ Only works in R version >= 3.6.2.
 Dataframes to be analyzed must be in the global environment prior to startup.
 
 # Usage and Description
-The following code will install and instiatiate the dashboard. 
+The following code will install and instiatiate the dashboard in R Studio. 
 ```R
 if(!'remotes' %in% installed.packages()){
   install.packages('remotes',dependencies = T)
