@@ -4,7 +4,7 @@ Interactive R - Shiny dashboard for factor analysis, subscale reliability, linea
 # Important
 Only works in R version >= 3.6.2.
 
-# Usage and Description
+# Installation and Usage
 The following code will install and instiatiate the dashboard in R Studio. 
 ```R
 if(!'remotes' %in% installed.packages()){
