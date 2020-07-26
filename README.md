@@ -2,7 +2,7 @@
 Interactive R - Shiny dashboard for factor analysis, subscale reliability, linear regression, and correlational analysis.
 
 # Important
-Only works in R version >= 3.6.2.
+Only works in R versions >= 3.6.2.
 
 # Installation and Usage
 The following code will install and instiatiate the dashboard in R Studio. 
