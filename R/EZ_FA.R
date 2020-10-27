@@ -1,3 +1,5 @@
+nowDf<-data.frame(matrix(nrow = 2, ncol = 5))
+
 EZ_FA<-function(){
   ####Options####
   #Remove Scientific Notation
@@ -23,130 +25,130 @@ EZ_FA<-function(){
   server <- function(input, output, session) {
     
     #Reactives
-    b1<-reactive({as.data.frame(matrix(c('Scales Need to have >2 Items for Scale Statistics')))})
-    dat<-reactive({if(exists(input$dataname) && length(input$dataname) !=0) get(as.character(input$dataname),env=global_env())})
-    dats<-reactive({dat() %>%
+    alpha2OrLess<-reactive({as.data.frame(matrix(c('Scales Need to have >2 Items for Scale Statistics')))})
+    dataSelected<-reactive({if(exists(input$dataname) && length(input$dataname) !=0) get(as.character(input$dataname),env=global_env())})
+    dataSelectedScaled<-reactive({dataSelected() %>%
         mutate_all(funs(scale))})
     
-    datt<-reactive({dat()[,-1]})
-    datn<-reactive({select_if(dat(),is.numeric)})
-    datc<-reactive({round(cor(datn(),use='pairwise.complete.obs'),2)})
-    pmat<-reactive({round(cor_pmat(datn()),2)})
+    dataSelectedDvExclude<-reactive({dataSelected()[,-1]})
+    dataSelectedNumeric<-reactive({select_if(dataSelected(),is.numeric)})
+    dataSelectedCorrelations<-reactive({round(cor(dataSelectedNumeric(),use='pairwise.complete.obs'),2)})
+    dataSelectedPvalMatrix<-reactive({round(cor_pmat(dataSelectedNumeric()),2)})
     
-    e1<-reactive({input$factor})
-    e2<-reactive({input$loadings})
-    e3<-reactive({input$rotation})
-    e4<-eventReactive(input$button,{input$factor})
-    e5<-reactive({input$scale})
-    e6<-reactive({as.character(input$column1)})
-    e7<-reactive({as.character(input$reg.inter)})
+    factorReactive<-reactive({input$factor})
+    loadingReactive<-reactive({input$loadings})
+    rotationReactive<-reactive({input$rotation})
+    startReactive<-eventReactive(input$button,{input$factor})
+    scaleReactive<-reactive({input$scale})
+    dvReactive<-reactive({as.character(input$column1)})
+    interactionsReactive<-reactive({as.character(input$reg.inter)})
     
-    a<-reactive({psych::alpha(if(e6()=='No'){dat()} else datt())})
-    a1<-reactive({input$scale})
+    itemStatistics<-reactive({psych::alpha(if(dvReactive()=='No'){dataSelected()} else dataSelectedDvExclude())})
+    itemStatisticsScaled<-reactive({input$scale})
     
-    r1<-eventReactive(input$button,{jmv::pca(data=if(e6()=='No'){dat()} else datt(),nFactorMethod='fixed',nFactors = e1(),hideLoadings=e2(),
-                                             screePlot=F,sortLoadings = T,eigen = T,rotation=e3(),
+    PCAResults<-eventReactive(input$button,{jmv::pca(data=if(dvReactive()=='No'){dataSelected()} else dataSelectedDvExclude(),nFactorMethod='fixed',nFactors = factorReactive(),hideLoadings=loadingReactive(),
+                                             screePlot=F,sortLoadings = T,eigen = T,rotation=rotationReactive(),
                                              factorSummary = T)})
-    r2<-reactive({jmv::pca(if(e6()=='No'){dat()} else datt(),screePlot=T,nFactorMethod = 'eigen',eigen=T)})
+    PCAEigenResults<-reactive({jmv::pca(if(dvReactive()=='No'){dataSelected()} else dataSelectedDvExclude(),screePlot=T,nFactorMethod = 'eigen',eigen=T)})
     
-    a2<-reactive({as.data.frame(r1()$loadings)})
+    PCALoadings<-reactive({as.data.frame(PCAResults()$loadings)})
     
-    m1<-reactive({a2()[,c(1,(a1()+1))]})
-    n1<-reactive({subset(m1(),!is.na(m1()[,2]))})
-    m2<-reactive({n1()[,1]})
+    PCALoadingColumns<-reactive({PCALoadings()[,c(1,(itemStatisticsScaled()+1))]})
+    PCAColumnsMatch<-reactive({subset(PCALoadingColumns(),!is.na(PCALoadingColumns()[,2]))})
+    PCAColumnMatchNames<-reactive({PCAColumnsMatch()[,1]})
     
-    alp<-reactive({
+    currentSubscaleItemStatistics<-reactive({
       psych::alpha(
-        dat()[,colnames(dat()) %in% m2()])
+        dataSelected()[,colnames(dataSelected()) %in% PCAColumnMatchNames()])
     })
     
-    alpr<-reactive({paste("'",as.character(colnames(dat())[colnames(dat()) %in% m2()]),"'",sep="",collapse=",")})
+    currentSubscaleItemNames<-reactive({paste("'",as.character(colnames(dataSelected())[colnames(dataSelected()) %in% PCAColumnMatchNames()]),"'",sep="",collapse=",")})
     
-    l1<-reactive({as.character(input$reg.IV)})
-    l2<-reactive({as.character(input$reg.DV)})
-    l3<-eventReactive(input$reg.button,{
-      u<-paste(l1(),collapse=if(e7()=='No'){'+'} else{'*'},sep='')
-      u1<-vector(mode='character',length=length(l1()))
+    IVsSelected<-reactive({as.character(input$reg.IV)})
+    DVSelected<-reactive({as.character(input$reg.DV)})
+    regressionLMExpression<-eventReactive(input$reg.button,{
+      IVs<-paste(IVsSelected(),collapse=if(interactionsReactive()=='No'){'+'} else{'*'},sep='')
+      IVNames<-vector(mode='character',length=length(IVsSelected()))
       if(input$reg.type=='Standardized'){
-        u1<-paste("lm(",l2(),'~',u,",data=dats())")
+        IVNames<-paste("lm(",DVSelected(),'~',IVs,",data=dataSelectedScaled())")
       }
       else{
-        u1<-paste("lm(",l2(),'~',u,",data=dat())")
+        IVNames<-paste("lm(",DVSelected(),'~',IVs,",data=dataSelected())")
       }
-      u2<-eval(parse(text=u1))
-      u3<-summary(u2)
+      evaluatedRegression<-eval(parse(text=IVNames))
+      regressionSummary<-summary(evaluatedRegression)
     })
     
     #Outputs
-    output$cor.plot<-renderPlot({ggcorrplot(datc(),outline.color='black',type='lower',
-                                            lab=T,p.mat=pmat(),ggtheme=ggplot2::theme_bw(),
+    output$cor.plot<-renderPlot({ggcorrplot(dataSelectedCorrelations(),outline.color='black',type='lower',
+                                            lab=T,p.mat=dataSelectedPvalMatrix(),ggtheme=ggplot2::theme_bw(),
                                             lab_col = 'black',sig.level = .05,insig='blank')})
     
     output$reg.table<-DT::renderDataTable(
-      DT::datatable(round_df(as.data.frame(l3()$coefficients),digits = 3),
+      DT::datatable(round_df(as.data.frame(regressionLMExpression()$coefficients),digits = 3),
                     options = list(pageLength = 100)))
     
-    output$reg.table2<-renderText({HTML(paste("R-Squared = <u>",round(l3()$r.squared,3),
-                                              "</u><br>F(",round(l3()$fstatistic[2],3),',',round(l3()$fstatistic[3],3),') = <u>',round(l3()$fstatistic[1],3),'</u><br>',
+    output$reg.table2<-renderText({HTML(paste("R-Squared = <u>",round(regressionLMExpression()$r.squared,3),
+                                              "</u><br>F(",round(regressionLMExpression()$fstatistic[2],3),',',round(regressionLMExpression()$fstatistic[3],3),') = <u>',round(regressionLMExpression()$fstatistic[1],3),'</u><br>',
                                               "<br><b>Note:</b> p-values coming soon!</br>",sep=''))})
     
     output$factor.table <- DT::renderDataTable({
-      DT::datatable(round_df(as.data.frame(r1()$loadings),digits=3),
-                    options = list(pageLength = ncol(dat()),
-                                   lengthMenu = c(5,10,15,round(1/2*ncol(dat()),0),ncol(dat()))),rownames=F)
+      DT::datatable(round_df(as.data.frame(PCAResults()$loadings),digits=3),
+                    options = list(pageLength = ncol(dataSelected()),
+                                   lengthMenu = c(5,10,15,round(1/2*ncol(dataSelected()),0),ncol(dataSelected()))),rownames=F)
     })
     
     output$eigen.table <- DT::renderDataTable({
-      DT::datatable(round_df(as.data.frame(r1()$factorStats$factorSummary),digits=2),
-                    options = list(pageLength = e1()))
+      DT::datatable(round_df(as.data.frame(PCAResults()$factorStats$factorSummary),digits=2),
+                    options = list(pageLength = factorReactive()))
     })
     
     output$init.eigen <- DT::renderDataTable({
-      DT::datatable(round_df(as.data.frame(r2()$eigen$initEigen),digits=2),
-                    options = list(pageLength = ncol(dat())))
+      DT::datatable(round_df(as.data.frame(PCAEigenResults()$eigen$initEigen),digits=2),
+                    options = list(pageLength = ncol(dataSelected())))
     })
     
     output$al.table <- DT::renderDataTable({
-      DT::datatable(round_df(as.data.frame(a()$total),digits=3),
+      DT::datatable(round_df(as.data.frame(itemStatistics()$total),digits=3),
                     options = list(pageLength = 1))
     })
     
     output$al.items <- DT::renderDataTable({
-      DT::datatable(round_df(as.data.frame(a()$item.stats),digits=3),
-                    options = list(pageLength = ncol(dat())))
+      DT::datatable(round_df(as.data.frame(itemStatistics()$item.stats),digits=3),
+                    options = list(pageLength = ncol(dataSelected())))
     })
     
     
     output$alpha.table <- DT::renderDataTable({
-      if(length(m2())>2){
-        DT::datatable(round_df(alp()$total,digits = 3))
+      if(length(PCAColumnMatchNames())>2){
+        DT::datatable(round_df(currentSubscaleItemStatistics()$total,digits = 3))
       }
       else{
-        DT::datatable(b1())
+        DT::datatable(alpha2OrLess())
       }
     })
     
     output$scale.table <- DT::renderDataTable({
-      if(length(m2())>2){
-        DT::datatable(round_df(alp()$alpha.drop,digits = 3),
+      if(length(PCAColumnMatchNames())>2){
+        DT::datatable(round_df(currentSubscaleItemStatistics()$alpha.drop,digits = 3),
                       options = list(pageLength = 100))
       }
       else{
-        DT::datatable(b1())
+        DT::datatable(alpha2OrLess())
       }
     })
     
     output$item.table <- DT::renderDataTable({
-      if(length(m2())>2){
-        DT::datatable(round_df(alp()$item.stats,digits = 3),
+      if(length(PCAColumnMatchNames())>2){
+        DT::datatable(round_df(currentSubscaleItemStatistics()$item.stats,digits = 3),
                       options = list(pageLength = 100))
       }
       else{
-        DT::datatable(b1())
+        DT::datatable(alpha2OrLess())
       }
     })
     
-    output$a.slider<-renderUI({
+    output$itemStatistics.slider<-renderUI({
       tagList(
         sliderInput('scale',
                     label='Subscale Number',
@@ -156,12 +158,12 @@ EZ_FA<-function(){
     })
     
     output$datanameo<-renderUI({tagList(selectInput(inputId = 'dataname',
-                                                    label = 'Select a Dataframe',
+                                                    label = 'Select itemStatistics Dataframe',
                                                     choices=c(temp)))})
     
     output$factoro<-renderUI({tagList(sliderInput(inputId='factor',
                                                   label = 'Number of Factors',
-                                                  value = 2, min = 1, max = ncol(dat()), step = 1))})
+                                                  value = 2, min = 1, max = ncol(dataSelected()), step = 1))})
     
     output$loadingso<-renderUI({tagList(sliderInput(inputId='loadings',
                                                     label = 'Hide Loadings Below',
@@ -180,46 +182,46 @@ EZ_FA<-function(){
     
     output$reg.IVo<-renderUI({tagList(checkboxGroupInput('reg.IV',
                                                          label='IVs',
-                                                         choices=as.list(colnames(dat())),
+                                                         choices=as.list(colnames(dataSelected())),
                                                          inline=F
     ))})
     
     output$reg.DVo<-renderUI({tagList(radioButtons('reg.DV',
                                                    label='DV',
-                                                   choices=as.list(colnames(dat())),
+                                                   choices=as.list(colnames(dataSelected())),
                                                    inline=F
     ))})
     
     output$alpha.names<-renderPrint({
-      cat(paste(alpr()))
+      cat(paste(currentSubscaleItemNames()))
     })
     
     output$scree <- renderPlot({
-      r2()$eigen$screePlot
+      PCAEigenResults()$eigen$screePlot
     })
     
     #Text
     
     output$factor.text<- renderText({
       HTML(paste('<h4><B>Factor Loadings on Principal Component Analysis of ',
-                 e4(),' Factors</B></h4>',sep=''))
+                 startReactive(),' Factors</B></h4>',sep=''))
     })
     
     output$eigen.text<- renderText({
       HTML(paste('<h4><B>Eigen Value Information for Principal Component Analysis of ',
-                 e4(),' Factors</h4></B>',sep=''))
+                 startReactive(),' Factors</h4></B>',sep=''))
     })
     
     output$alpha.text<- renderText({
-      HTML(paste("<h4><B>Cronbach's Alpha Criteria for Subscale ",e5(),'</B></h4>',sep=''))
+      HTML(paste("<h4><B>Cronbach's Alpha Criteria for Subscale ",scaleReactive(),'</B></h4>',sep=''))
     })
     
     output$scale.text<- renderText({
-      HTML(paste("<h4><B>Alpha if Item Dropped for Subscale ",e5(),'</B></h4>',sep=''))
+      HTML(paste("<h4><B>Alpha if Item Dropped for Subscale ",scaleReactive(),'</B></h4>',sep=''))
     })
     
     output$items.text<- renderText({
-      HTML(paste("<h4><B>Item Statistics for Subscale ",e5(),'</B></h4>',sep=''))
+      HTML(paste("<h4><B>Item Statistics for Subscale ",scaleReactive(),'</B></h4>',sep=''))
     })
   }
   #UI
@@ -231,7 +233,7 @@ EZ_FA<-function(){
     tabsetPanel(
       
       tabPanel("Factor",
-               tags$p(tags$h3(tags$strong("Choose a Dataframe, PCA Settings, and Press 'Run' to get Started"))),
+               tags$p(tags$h3(tags$strong("Choose itemStatistics Dataframe, PCA Settings, and Press 'Run' to get Started"))),
                
                sidebarLayout(
                  sidebarPanel(
@@ -291,7 +293,7 @@ EZ_FA<-function(){
                sidebarLayout(
                  sidebarPanel(
                    
-                   uiOutput('a.slider')
+                   uiOutput('itemStatistics.slider')
                  ),
                  
                  mainPanel(
@@ -371,3 +373,4 @@ EZ_FA<-function(){
   )
   shinyApp(ui, server)
 }
+EZ_FA()
