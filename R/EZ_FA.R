@@ -1,4 +1,3 @@
-nowDf<-data.frame(matrix(nrow = 2, ncol = 5))
 
 EZ_FA<-function(){
   ####Options####
@@ -158,7 +157,7 @@ EZ_FA<-function(){
     })
     
     output$datanameo<-renderUI({tagList(selectInput(inputId = 'dataname',
-                                                    label = 'Select itemStatistics Dataframe',
+                                                    label = 'Select a Dataframe',
                                                     choices=c(temp)))})
     
     output$factoro<-renderUI({tagList(sliderInput(inputId='factor',
@@ -233,7 +232,7 @@ EZ_FA<-function(){
     tabsetPanel(
       
       tabPanel("Factor",
-               tags$p(tags$h3(tags$strong("Choose itemStatistics Dataframe, PCA Settings, and Press 'Run' to get Started"))),
+               tags$p(tags$h3(tags$strong("Choose a Dataframe, PCA Settings, and Press 'Run' to get Started"))),
                
                sidebarLayout(
                  sidebarPanel(
@@ -258,13 +257,17 @@ EZ_FA<-function(){
                ),
                wellPanel(
                  htmlOutput('factor.text'),
-                 
-                 div(DT::dataTableOutput(outputId = 'factor.table'),
-                     style = "font-size: 100%; width: 45%")
+                 fluidRow(
+                   column(6,
+                          div(DT::dataTableOutput(outputId = 'factor.table'),
+                              style = "font-size: 100%; width: 95%")
+                   ),
+                   column(6,
+                          div(DT::dataTableOutput(outputId = 'eigen.table'),
+                              style = "font-size: 100%; width: 95%")
+                   )
+                 )
                ),
-               wellPanel(
-                 div(DT::dataTableOutput(outputId = 'eigen.table'),
-                     style = "font-size: 100%; width: 95%")),
                
                sidebarLayout(
                  sidebarPanel(
@@ -273,7 +276,9 @@ EZ_FA<-function(){
                    tags$p(tags$h4(tags$strong('Initial Eigenvalue Table'))),
                    
                    div(DT::dataTableOutput(outputId = 'init.eigen'),
-                       style = 'font-size: 100%; width: 95%')
+                       style = 'font-size: 100%; width: 95%'),
+                   
+                   width = 12
                  ),
                  
                  mainPanel(
@@ -283,8 +288,9 @@ EZ_FA<-function(){
                    DT::dataTableOutput(outputId = 'al.table'),
                    
                    tags$p(tags$h4(tags$strong("Scale Item Statistics"))),
-                   DT::dataTableOutput(outputId = 'al.items')
+                   DT::dataTableOutput(outputId = 'al.items'),
                    
+                   width = 12
                  )
                )
       ),
