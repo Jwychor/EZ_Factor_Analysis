@@ -223,8 +223,13 @@ EZ_FA<-function(){
       HTML(paste("<h4><B>Item Statistics for Subscale ",scaleReactive(),'</B></h4>',sep=''))
     })
   }
+  
+  
+#####################################################################################################
   #UI
   ui <- fluidPage(
+    
+    includeCSS("styles.css"),
     
     titlePanel('EZ Factor Analysis'),
     
