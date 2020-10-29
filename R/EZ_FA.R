@@ -416,7 +416,7 @@ EZ_FA<-function(){
                             
                             tags$p(tags$h4(tags$strong("Correlation Matrix (Non-significant Values at p > .05 are Left Blank)"))),
                             
-                            div(plotOutput('cor.plot',width = '103%' height = '600px'),
+                            div(plotOutput('cor.plot',width = '103%', height = '600px'),
                                 style = "margin-left: -20px; min-height: 650px")
                           )
                      )
