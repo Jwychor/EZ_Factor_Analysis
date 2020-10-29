@@ -1,11 +1,10 @@
-
 EZ_FA<-function(){
   ####Options####
   #Remove Scientific Notation
   options(scipen=999)
   
   ####Packages####
-  load.lib<-c('rlang','DT','psych','jmv','shiny','tidyverse','ggcorrplot')
+  load.lib<-c('rlang','DT','psych','jmv','shiny','tidyverse','ggcorrplot','shinythemes')
   
   sapply(load.lib,library,character=TRUE)
   
@@ -61,7 +60,7 @@ EZ_FA<-function(){
         dataSelected()[,colnames(dataSelected()) %in% PCAColumnMatchNames()])
     })
     
-    currentSubscaleItemNames<-reactive({paste("'",as.character(colnames(dataSelected())[colnames(dataSelected()) %in% PCAColumnMatchNames()]),"'",sep="",collapse=",")})
+    currentSubscaleItemNames<-reactive({paste("'",as.character(colnames(dataSelected())[colnames(dataSelected()) %in% PCAColumnMatchNames()]),"'",sep="",collapse=", ")})
     
     IVsSelected<-reactive({as.character(input$reg.IV)})
     DVSelected<-reactive({as.character(input$reg.DV)})
@@ -150,7 +149,7 @@ EZ_FA<-function(){
     output$itemStatistics.slider<-renderUI({
       tagList(
         sliderInput('scale',
-                    label='Subscale Number',
+                    label='Subscale Index',
                     value = 1, min = 1, max = input$factor,step = 1)
       )
       
@@ -212,7 +211,7 @@ EZ_FA<-function(){
     })
     
     output$alpha.text<- renderText({
-      HTML(paste("<h4><B>Cronbach's Alpha Criteria for Subscale ",scaleReactive(),'</B></h4>',sep=''))
+      HTML(paste("<h4><B>Cronbach's Alpha for Subscale ",scaleReactive(),'</B></h4>',sep=''))
     })
     
     output$scale.text<- renderText({
@@ -227,161 +226,203 @@ EZ_FA<-function(){
   
 #####################################################################################################
   #UI
-  ui <- fluidPage(
-    
-    includeCSS("styles.css"),
-    
-    titlePanel('EZ Factor Analysis'),
-    
-    #Inputs
-    tabsetPanel(
+  if(length(temp) == 0){
+    ui <- fluidPage(
+      includeCSS("styles.css"),
       
-      tabPanel("Factor",
-               tags$p(tags$h3(tags$strong("Choose a Dataframe, PCA Settings, and Press 'Run' to get Started"))),
-               
-               sidebarLayout(
-                 sidebarPanel(
-                   uiOutput('datanameo'),
-                   
-                   uiOutput('factoro'),
-                   
-                   uiOutput('loadingso'),
-                   
-                   uiOutput('rotationo'),
-                   
-                   uiOutput('column1o'),
-                   
-                   uiOutput('buttono')),
-                 
-                 #Outputs
-                 mainPanel(
-                   tags$p(tags$h4(tags$strong("Scree Plot"))),
-                   
-                   plotOutput(outputId = 'scree',width = '100%')
-                 )
-               ),
-               wellPanel(
-                 htmlOutput('factor.text'),
-                 fluidRow(
-                   column(6,
-                          div(DT::dataTableOutput(outputId = 'factor.table'),
-                              style = "font-size: 100%; width: 95%")
-                   ),
-                   column(6,
-                          div(DT::dataTableOutput(outputId = 'eigen.table'),
-                              style = "font-size: 100%; width: 95%")
-                   )
-                 )
-               ),
-               
-               sidebarLayout(
-                 sidebarPanel(
-                   htmlOutput('eigen.text'),
-                   
-                   tags$p(tags$h4(tags$strong('Initial Eigenvalue Table'))),
-                   
-                   div(DT::dataTableOutput(outputId = 'init.eigen'),
-                       style = 'font-size: 100%; width: 95%'),
-                   
-                   width = 12
-                 ),
-                 
-                 mainPanel(
-                   htmlOutput('al.text'),
-                   
-                   tags$p(tags$h4(tags$strong("Scale Cronbach's Alpha"))),
-                   DT::dataTableOutput(outputId = 'al.table'),
-                   
-                   tags$p(tags$h4(tags$strong("Scale Item Statistics"))),
-                   DT::dataTableOutput(outputId = 'al.items'),
-                   
-                   width = 12
-                 )
-               )
+      headerPanel('<h2>EZ Factor Analysis</h2>',
+                 tags$img(src="Logo.png")
       ),
-      tabPanel("Subscales",
-               tags$p(tags$h3(tags$strong("Press 'Run' in the 'Factor' Tab to Analyze Subscales"))),
-               sidebarLayout(
-                 sidebarPanel(
+      
+      wellPanel(
+        tags$h2("No dataframes found. Please take the following steps:"),
+        tags$h4("1.) Close the application"),
+        tags$h4("2.) Create or import a dataframe to your R environment"),
+        tags$h4("3.) Run 'EZ_FA()' to start the dashboard again")
+      )
+    )
+  }
+  else{
+    ui <- fluidPage(theme = shinytheme("darkly"),
+      includeCSS("styles.css"),
+      
+      headerPanel(
+        list(HTML('<a href="https://github.com/jwychor"><img src="https://i.ibb.co/n3r8vLx/Logo.png" alt="Logo" border="0" style="height: 100px; width: 100px;" /></a>','EZ Factor Analysis'))
+      ),
+      
+      #Inputs
+      tabsetPanel(
+        
+        tabPanel("Factor",
+                 tags$p(tags$h3(tags$strong("Choose a Dataframe, PCA Settings, and Press 'Run'"))),
+                 
+                 sidebarLayout(
+                   sidebarPanel(
+                     uiOutput('datanameo'),
+                     
+                     uiOutput('factoro'),
+                     
+                     uiOutput('loadingso'),
+                     
+                     uiOutput('rotationo'),
+                     
+                     uiOutput('column1o'),
+                     
+                     uiOutput('buttono')),
                    
-                   uiOutput('itemStatistics.slider')
+                   #Outputs
+                   mainPanel(
+                     tags$p(tags$h4(tags$strong("Scree Plot"))),
+                     
+                     plotOutput(outputId = 'scree',width = '100%')
+                   )
                  ),
-                 
-                 mainPanel(
-                   htmlOutput('alpha.text'),
+                     wellPanel(
+                       htmlOutput('factor.text'),
+                       
+                       fluidRow(
+                         column(12,
+                                div(DT::dataTableOutput(outputId = 'factor.table'),
+                                    style = "font-size: 100%; width: 95%")
+                         ),
+                         
+                         
+                         tags$p(tags$h4(tags$strong('Component Statistics', id = "component-statistics",))),
+                         
+                         column(8,
+                                div(DT::dataTableOutput(outputId = 'eigen.table'),
+                                    style = "font-size: 100%; width: 95%")
+                         ),
+                         width = 12
+                      )
+                   ),
+                   wellPanel(
+                     tags$p(tags$h4(tags$strong('Eigenvalue Statistics'))),
+                     
+                     div(DT::dataTableOutput(outputId = 'init.eigen'),
+                         style = 'font-size: 100%; width: 95%'),
+                     
+                     width = 12
+                   ),
+                     wellPanel(
+                     htmlOutput('al.text'),
+                     
+                     tags$p(tags$h4(tags$strong("Scale Cronbach's Alpha"))),
+                     DT::dataTableOutput(outputId = 'al.table'),
+                     
+                     tags$hr(),
+                     
+                     tags$p(tags$h4(tags$strong("Scale Item Statistics"))),
+                     DT::dataTableOutput(outputId = 'al.items'),
+                     
+                     width = 12
+                   )
+        ),
+        tabPanel("Subscales",
+                 tags$p(tags$h3(tags$strong("Press 'Run' in the 'Factor' Tab to Analyze Subscales"))),
+                 sidebarLayout(
+                   sidebarPanel(
+                     
+                     uiOutput('itemStatistics.slider')
+                   ),
                    
-                   div(DT::dataTableOutput(outputId = 'alpha.table'),
-                       style = "font-size: 90%; width: 45%")
+                   mainPanel(
+                     wellPanel(
+                     htmlOutput('alpha.text'),
+                     
+                     div(DT::dataTableOutput(outputId = 'alpha.table'),
+                         style = "font-size: 90%; width: 45%")
+                     
+                    )
+                   )
+                 ),
+                 wellPanel(
+                   tags$p(tags$h4(tags$strong("Subscale Items List"))),
+                   tags$head(tags$style(HTML("pre { overflow: auto; word-wrap: normal; }"))),
                    
-                 )
-               ),
-               wellPanel(
-                 tags$p(tags$h4(tags$strong("Subscale Items List"))),
-                 tags$head(tags$style(HTML("pre { overflow: auto; word-wrap: normal; }"))),
-                 div(textOutput(outputId='alpha.names'),
-                     style = "font-size: 100%; width: 90%"),
-                 
-                 htmlOutput('scale.text'),
-                 
-                 div(DT::dataTableOutput(outputId = 'scale.table'),
-                     style = "font-size: 100%; width: 90%"),
-                 
+                   div(textOutput(outputId='alpha.names'),
+                       style = "font-size: 100%; width: 90%"),
+                   tags$hr(),
+                   
+                   htmlOutput('scale.text'),
+                   
+                   div(DT::dataTableOutput(outputId = 'scale.table'),
+                       style = "font-size: 100%; width: 90%"),
+                   ),
                  wellPanel(
                    htmlOutput('items.text'),
                    
                    div(DT::dataTableOutput(outputId = 'item.table'),
                        style = "font-size: 100%; width: 90%")
                  )
-               )
-      ),
-      tabPanel('Regression',
-               tags$p(tags$h3(tags$strong("Choose Linear Regression Settings and Press 'Run' to get Started"))),
-               
-               fluidRow(
-                 column(2,
-                        wellPanel(
-                          uiOutput('reg.IVo'
+        ),
+        tabPanel('Regression',
+                 tags$p(tags$h3(tags$strong("Choose Linear Regression Settings and Press 'Run'"))),
+                 
+                 fluidRow(
+                   column(6,
+                     fluidRow(
+                     column(4,
+                            wellPanel(
+                              uiOutput('reg.IVo'
+                              )
+                            )
+                     ),
+                     column(4,
+                            wellPanel(
+                              uiOutput('reg.DVo'
+                              )
+                            )
+                     ),
+                     column(4,
+                            wellPanel(
+                              id = "Regression-Run",
+                              
+                              class = "sticky-top",
+                              
+                              class = "position-sticky",
+                              
+                              selectInput('reg.type',
+                                          label='Type',
+                                          choices=c('Standardized','Unstandardized')),
+                              
+                              selectInput('reg.inter',
+                                          label='Include all Interactions?',
+                                          choice=c('No','Yes')),
+                              
+                              actionButton('reg.button',
+                                           label='Run')
+                            )
+                     ),
+                     column(12,
+                            
+                       )
+                     )
+                   ),
+                   column(6,
+                          wellPanel(
+                            tags$p(tags$h4(tags$strong("Linear Regression Table"))),
+                            
+                            div(DT::DTOutput(outputId='reg.table'),
+                                style = "font-size: 100%; width: 100%"
+                            ),
+                            
+                            div(htmlOutput('reg.table2'),
+                                style = "font-size: 1.3em")
+                          ), 
+                          wellPanel(
+                            
+                            tags$p(tags$h4(tags$strong("Correlation Matrix (Non-significant Values at p > .05 are Left Blank)"))),
+                            
+                            div(plotOutput('cor.plot',width='103%'),
+                                style = "margin-left: -20px;")
                           )
-                        )
-                 ),
-                 column(2,
-                        wellPanel(
-                          uiOutput('reg.DVo'
-                          )
-                        )
-                 ),
-                 column(2,
-                        wellPanel(
-                          selectInput('reg.type',
-                                      label='Type',
-                                      choices=c('Standardized','Unstandardized')),
-                          
-                          selectInput('reg.inter',
-                                      label='Include all Interactions?',
-                                      choice=c('No','Yes')),
-                          
-                          actionButton('reg.button',
-                                       label='Run')
-                        )
-                 ),
-                 column(6,
-                        wellPanel(
-                          tags$p(tags$h4(tags$strong("Linear Regression Table"))),
-                          
-                          div(DT::DTOutput(outputId='reg.table'),
-                              style = "font-size: 100%; width: 100%"
-                          ),
-                          htmlOutput('reg.table2'),
-                          
-                          tags$p(tags$h4(tags$strong("Correlation Matrix (Non-significant Values at p > .05 are Left Blank)"))),
-                          
-                          plotOutput('cor.plot',width='650px',height='800px')
-                        )
-                 )
-               )
+                     )
+          )
+        )
       )
     )
-  )
+  }
+  
   shinyApp(ui, server)
 }
-EZ_FA()

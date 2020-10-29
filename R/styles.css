@@ -1,0 +1,42 @@
+body{
+	background-color: rgba(0,180,255,1);
+}
+
+hr{
+	border: 1px solid white;
+}
+
+h1{
+	font-size: 56px;
+	font-weight: 700;
+	text-align: center;
+}
+
+table.table.dataTable tbody tr.active td {
+	color: unset !important;
+}
+
+label, a, th, thead, .paginate_button{
+	color: white !important;
+}
+
+select{
+	color: black;
+}
+
+.shiny-output-error{
+	background-color: rgb(255,255,255) !important;
+}
+
+#cor.plot{
+	width: 100%;
+}
+
+#component-statistics{
+	padding-left: 15px;
+}
+
+#Regression-Run{
+	top: 0px;
+}
+

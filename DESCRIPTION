@@ -10,7 +10,8 @@ Depends:
   rlang,
   tidyverse,
   ggcorrplot,
-  shiny
+  shiny,
+  shinythemes
 Imports:
   DT,
   psych,
