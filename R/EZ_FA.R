@@ -25,11 +25,12 @@ EZ_FA<-function(){
     #Reactives
     alpha2OrLess<-reactive({as.data.frame(matrix(c('Scales Need to have >2 Items for Scale Statistics')))})
     dataSelected<-reactive({if(exists(input$dataname) && length(input$dataname) !=0) get(as.character(input$dataname),env=global_env())})
-    dataSelectedScaled<-reactive({dataSelected() %>%
+    dataSelectedNumeric<-reactive({select_if(dataSelected(),is.numeric)})
+    
+    dataSelectedDvExclude<-reactive({select_if(dataSelected()[,-1],is.numeric)})
+    dataSelectedScaled<-reactive({dataSelectedNumeric() %>%
         mutate_all(funs(scale))})
     
-    dataSelectedDvExclude<-reactive({dataSelected()[,-1]})
-    dataSelectedNumeric<-reactive({select_if(dataSelected(),is.numeric)})
     dataSelectedCorrelations<-reactive({round(cor(dataSelectedNumeric(),use='pairwise.complete.obs'),2)})
     dataSelectedPvalMatrix<-reactive({round(cor_pmat(dataSelectedNumeric()),2)})
     
@@ -41,13 +42,13 @@ EZ_FA<-function(){
     dvReactive<-reactive({as.character(input$column1)})
     interactionsReactive<-reactive({as.character(input$reg.inter)})
     
-    itemStatistics<-reactive({psych::alpha(if(dvReactive()=='No'){dataSelected()} else dataSelectedDvExclude())})
+    itemStatistics<-reactive({psych::alpha(if(dvReactive()=='No'){dataSelectedNumeric()} else dataSelectedDvExclude())})
     itemStatisticsScaled<-reactive({input$scale})
     
-    PCAResults<-eventReactive(input$button,{jmv::pca(data=if(dvReactive()=='No'){dataSelected()} else dataSelectedDvExclude(),nFactorMethod='fixed',nFactors = factorReactive(),hideLoadings=loadingReactive(),
+    PCAResults<-eventReactive(input$button,{jmv::pca(data=if(dvReactive()=='No'){dataSelectedNumeric()} else dataSelectedDvExclude(),nFactorMethod='fixed',nFactors = factorReactive(),hideLoadings=loadingReactive(),
                                              screePlot=F,sortLoadings = T,eigen = T,rotation=rotationReactive(),
                                              factorSummary = T)})
-    PCAEigenResults<-reactive({jmv::pca(if(dvReactive()=='No'){dataSelected()} else dataSelectedDvExclude(),screePlot=T,nFactorMethod = 'eigen',eigen=T)})
+    PCAEigenResults<-reactive({jmv::pca(if(dvReactive()=='No'){dataSelectedNumeric()} else dataSelectedDvExclude(),screePlot=T,nFactorMethod = 'eigen',eigen=T)})
     
     PCALoadings<-reactive({as.data.frame(PCAResults()$loadings)})
     
@@ -57,10 +58,10 @@ EZ_FA<-function(){
     
     currentSubscaleItemStatistics<-reactive({
       psych::alpha(
-        dataSelected()[,colnames(dataSelected()) %in% PCAColumnMatchNames()])
+        dataSelectedNumeric()[,colnames(dataSelectedNumeric()) %in% PCAColumnMatchNames()])
     })
     
-    currentSubscaleItemNames<-reactive({paste("'",as.character(colnames(dataSelected())[colnames(dataSelected()) %in% PCAColumnMatchNames()]),"'",sep="",collapse=", ")})
+    currentSubscaleItemNames<-reactive({paste("'",as.character(colnames(dataSelectedNumeric())[colnames(dataSelectedNumeric()) %in% PCAColumnMatchNames()]),"'",sep="",collapse=", ")})
     
     IVsSelected<-reactive({as.character(input$reg.IV)})
     DVSelected<-reactive({as.character(input$reg.DV)})
@@ -71,7 +72,7 @@ EZ_FA<-function(){
         IVNames<-paste("lm(",DVSelected(),'~',IVs,",data=dataSelectedScaled())")
       }
       else{
-        IVNames<-paste("lm(",DVSelected(),'~',IVs,",data=dataSelected())")
+        IVNames<-paste("lm(",DVSelected(),'~',IVs,",data=dataSelectedNumeric())")
       }
       evaluatedRegression<-eval(parse(text=IVNames))
       regressionSummary<-summary(evaluatedRegression)
@@ -92,8 +93,8 @@ EZ_FA<-function(){
     
     output$factor.table <- DT::renderDataTable({
       DT::datatable(round_df(as.data.frame(PCAResults()$loadings),digits=3),
-                    options = list(pageLength = ncol(dataSelected()),
-                                   lengthMenu = c(5,10,15,round(1/2*ncol(dataSelected()),0),ncol(dataSelected()))),rownames=F)
+                    options = list(pageLength = ncol(dataSelectedNumeric()),
+                                   lengthMenu = c(5,10,15,round(1/2*ncol(dataSelectedNumeric()),0),ncol(dataSelectedNumeric()))),rownames=F)
     })
     
     output$eigen.table <- DT::renderDataTable({
@@ -103,7 +104,7 @@ EZ_FA<-function(){
     
     output$init.eigen <- DT::renderDataTable({
       DT::datatable(round_df(as.data.frame(PCAEigenResults()$eigen$initEigen),digits=2),
-                    options = list(pageLength = ncol(dataSelected())))
+                    options = list(pageLength = ncol(dataSelectedNumeric())))
     })
     
     output$al.table <- DT::renderDataTable({
@@ -113,7 +114,7 @@ EZ_FA<-function(){
     
     output$al.items <- DT::renderDataTable({
       DT::datatable(round_df(as.data.frame(itemStatistics()$item.stats),digits=3),
-                    options = list(pageLength = ncol(dataSelected())))
+                    options = list(pageLength = ncol(dataSelectedNumeric())))
     })
     
     
@@ -161,7 +162,7 @@ EZ_FA<-function(){
     
     output$factoro<-renderUI({tagList(sliderInput(inputId='factor',
                                                   label = 'Number of Factors',
-                                                  value = 2, min = 1, max = ncol(dataSelected()), step = 1))})
+                                                  value = 2, min = 1, max = ncol(dataSelectedNumeric()), step = 1))})
     
     output$loadingso<-renderUI({tagList(sliderInput(inputId='loadings',
                                                     label = 'Hide Loadings Below',
@@ -180,13 +181,13 @@ EZ_FA<-function(){
     
     output$reg.IVo<-renderUI({tagList(checkboxGroupInput('reg.IV',
                                                          label='IVs',
-                                                         choices=as.list(colnames(dataSelected())),
+                                                         choices=as.list(colnames(dataSelectedNumeric())),
                                                          inline=F
     ))})
     
     output$reg.DVo<-renderUI({tagList(radioButtons('reg.DV',
                                                    label='DV',
-                                                   choices=as.list(colnames(dataSelected())),
+                                                   choices=as.list(colnames(dataSelectedNumeric())),
                                                    inline=F
     ))})
     
@@ -272,9 +273,10 @@ EZ_FA<-function(){
                    
                    #Outputs
                    mainPanel(
-                     tags$p(tags$h4(tags$strong("Scree Plot"))),
-                     
+                     wellPanel(
+                     tags$p(tags$h3(tags$strong("Scree Plot"))),
                      plotOutput(outputId = 'scree',width = '100%')
+                     )
                    )
                  ),
                      wellPanel(
@@ -414,8 +416,8 @@ EZ_FA<-function(){
                             
                             tags$p(tags$h4(tags$strong("Correlation Matrix (Non-significant Values at p > .05 are Left Blank)"))),
                             
-                            div(plotOutput('cor.plot',width='103%'),
-                                style = "margin-left: -20px;")
+                            div(plotOutput('cor.plot',width = '103%' height = '600px'),
+                                style = "margin-left: -20px; min-height: 650px")
                           )
                      )
           )

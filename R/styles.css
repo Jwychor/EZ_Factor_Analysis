@@ -25,7 +25,6 @@ select{
 }
 
 .shiny-output-error{
-	background-color: rgb(255,255,255) !important;
 }
 
 #cor.plot{
