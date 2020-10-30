@@ -16,7 +16,7 @@ EZ_FA<-function(){
     (df)
   }
   
-  temp<-names(Filter(function(x) is(x, "data.frame"), mget(ls(rlang::global_env()),env=rlang::global_env())))
+  temp<-names(Filter(function(x) {is(x, "data.frame")}, mget(ls(rlang::global_env()),env=rlang::global_env())))
   
   ####Application#####
   #Server
@@ -42,13 +42,13 @@ EZ_FA<-function(){
     dvReactive<-reactive({as.character(input$column1)})
     interactionsReactive<-reactive({as.character(input$reg.inter)})
     
-    itemStatistics<-reactive({psych::alpha(if(dvReactive()=='No'){dataSelectedNumeric()} else dataSelectedDvExclude())})
+    itemStatistics<-reactive({psych::alpha(if(dvReactive()=='No'){dataSelectedNumeric()} else {dataSelectedDvExclude()})})
     itemStatisticsScaled<-reactive({input$scale})
     
     PCAResults<-eventReactive(input$button,{jmv::pca(data=if(dvReactive()=='No'){dataSelectedNumeric()} else dataSelectedDvExclude(),nFactorMethod='fixed',nFactors = factorReactive(),hideLoadings=loadingReactive(),
                                              screePlot=F,sortLoadings = T,eigen = T,rotation=rotationReactive(),
                                              factorSummary = T)})
-    PCAEigenResults<-reactive({jmv::pca(if(dvReactive()=='No'){dataSelectedNumeric()} else dataSelectedDvExclude(),screePlot=T,nFactorMethod = 'eigen',eigen=T)})
+    PCAEigenResults<-reactive({jmv::pca(if(dvReactive()=='No'){dataSelectedNumeric()} else {dataSelectedDvExclude()},screePlot=T,nFactorMethod = 'eigen',eigen=T)})
     
     PCALoadings<-reactive({as.data.frame(PCAResults()$loadings)})
     
@@ -289,7 +289,7 @@ EZ_FA<-function(){
                          ),
                          
                          
-                         tags$p(tags$h4(tags$strong('Component Statistics', id = "component-statistics",))),
+                         tags$p(tags$h4(tags$strong('Component Statistics', id = "component-statistics"))),
                          
                          column(8,
                                 div(DT::dataTableOutput(outputId = 'eigen.table'),
