@@ -229,7 +229,7 @@ EZ_FA<-function(){
   #UI
   if(length(temp) == 0){
     ui <- fluidPage(
-      includeCSS("styles.css"),
+      includeCSS("css/styles.css"),
       
       headerPanel(
                  list(HTML('<a href="https://github.com/jwychor"><img src="https://i.ibb.co/n3r8vLx/Logo.png" alt="Logo" border="0" style="height: 100px; width: 100px;" /></a>','EZ Factor Analysis'))
@@ -245,7 +245,7 @@ EZ_FA<-function(){
   }
   else{
     ui <- fluidPage(theme = shinytheme("darkly"),
-      includeCSS("css/styles.css", package="EZFA"),
+      includeCSS("css/styles.css"),
       
       headerPanel(
         list(HTML('<a href="https://github.com/jwychor"><img src="https://i.ibb.co/n3r8vLx/Logo.png" alt="Logo" border="0" style="height: 100px; width: 100px;" /></a>','EZ Factor Analysis'))
