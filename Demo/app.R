@@ -9,8 +9,7 @@ if(!'rlang' %in% installed.packages()){
   remotes::install_github('r-lib/rlang', dependencies = T)
 }
 library('remotes')
-devtools::install_github("Jwychor/EZ_Factor_Analysis", dependencies = T, update = "ask")
+remotes::install_github("Jwychor/EZ_Factor_Analysis", dependencies = T, update = "ask", force=T)
 library('EZFA')
+
 EZ_FA()
-invisible(lapply(paste0('package:', names(sessionInfo()$otherPkgs)), detach, character.only=TRUE, unload=TRUE))
-install.packages('rlang')
