@@ -4,7 +4,7 @@ Interactive R - Shiny dashboard for factor analysis, subscale reliability, linea
 # Important
 Only works in R versions >= 3.6.2.
 
-# Installation and Usage
+# Installation
 The following code will install and instiatiate the dashboard in R Studio. 
 ```R
 if(!'remotes' %in% installed.packages()){
@@ -21,6 +21,7 @@ EZ_FA()
 ```
 If the console prompts you to install new versions of dependencies that are already installed, this is not necessary and entering "3" (none) when prompted is fine.
 
+# Usage
 The dashboard can access all dataframes in the current global environment. Closing the application will allow the user to access R functionality again. To use the dashboard in future files use 
 ```
 library(EZFA)
@@ -50,16 +51,5 @@ In the regression tab, there is a list of each variable in the selected datafram
 
 ![image](https://github.com/Jwychor/EZ_Factor_Analysis/blob/master/Images/EZ_FA%20Page%203.JPG)
 
-# Dependencies
-Functions from the following packages are required to be installed and required on your machine before this code will run:
-```
-Rlang
-DT
-devtools
-jmv
-tidyverse
-psych
-shiny
-ggcorrplot
-
-```
+# Examples
+A live demo of the dashboard hosted on shinyapps.io can be found [here.](https://jwychor.shinyapps.io/EZ_FA_Demo/)
